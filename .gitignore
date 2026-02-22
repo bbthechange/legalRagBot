@@ -1,0 +1,30 @@
+# Environment & secrets
+.env
+.env.*
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# FAISS index artifacts
+data/faiss_index/
+
+# Claude Code config
+.claude/
+
+# Temp
+tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

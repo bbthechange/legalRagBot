@@ -1,0 +1,137 @@
+[
+  {
+    "id": "nda-001",
+    "type": "NDA",
+    "category": "confidentiality",
+    "title": "Standard Mutual NDA - Confidentiality Obligation",
+    "text": "Each party agrees to hold in strict confidence all Confidential Information received from the other party. Confidential Information shall not be disclosed to any third party without the prior written consent of the disclosing party. Each party shall use the same degree of care to protect the other party's Confidential Information as it uses to protect its own confidential information, but in no event less than reasonable care.",
+    "risk_level": "low",
+    "notes": "Standard mutual NDA language. Well-balanced protection for both parties."
+  },
+  {
+    "id": "nda-002",
+    "type": "NDA",
+    "category": "confidentiality",
+    "title": "Aggressive One-Way NDA - Broad Definition",
+    "text": "The Receiving Party acknowledges that all information, whether written, oral, electronic, or visual, disclosed by or on behalf of the Disclosing Party, including but not limited to trade secrets, business plans, customer lists, financial data, technical specifications, and any other information of any nature whatsoever, shall be deemed Confidential Information regardless of whether such information is marked as confidential.",
+    "risk_level": "high",
+    "notes": "Overly broad definition of confidential information. No carve-outs for publicly available information or independently developed information. Favors disclosing party heavily."
+  },
+  {
+    "id": "nda-003",
+    "type": "NDA",
+    "category": "term_and_termination",
+    "title": "NDA Duration - Perpetual Obligation",
+    "text": "The obligations of confidentiality set forth herein shall survive in perpetuity and shall not be subject to any limitation period. The Receiving Party's duty to protect Confidential Information shall continue indefinitely regardless of whether this Agreement is terminated.",
+    "risk_level": "high",
+    "notes": "Perpetual confidentiality obligations are problematic. Industry standard is 2-5 years. Perpetual terms create indefinite liability."
+  },
+  {
+    "id": "nda-004",
+    "type": "NDA",
+    "category": "term_and_termination",
+    "title": "NDA Duration - Standard Time-Limited",
+    "text": "This Agreement shall remain in effect for a period of two (2) years from the Effective Date. The confidentiality obligations hereunder shall survive termination or expiration of this Agreement for a period of three (3) years following such termination or expiration.",
+    "risk_level": "low",
+    "notes": "Reasonable time limitation. 2-year term with 3-year survival is within industry norms."
+  },
+  {
+    "id": "emp-001",
+    "type": "Employment",
+    "category": "non_compete",
+    "title": "Reasonable Non-Compete Clause",
+    "text": "For a period of twelve (12) months following termination of employment, Employee agrees not to engage in any business that directly competes with the Company's primary business within a fifty (50) mile radius of the Employee's primary work location. This restriction applies only to the specific business line in which Employee was primarily engaged.",
+    "risk_level": "medium",
+    "notes": "Generally enforceable non-compete. Limited in time (12 months), geography (50 miles), and scope (specific business line). Some states may still restrict enforcement."
+  },
+  {
+    "id": "emp-002",
+    "type": "Employment",
+    "category": "non_compete",
+    "title": "Overly Broad Non-Compete",
+    "text": "Employee agrees that for a period of three (3) years following termination of employment for any reason, Employee shall not directly or indirectly engage in, own, manage, operate, consult for, or be employed by any business that is in any way competitive with any of the Company's businesses, anywhere in the world.",
+    "risk_level": "high",
+    "notes": "Likely unenforceable in most jurisdictions. 3-year duration is excessive, worldwide scope is overbroad, and covers all company businesses rather than employee's specific role."
+  },
+  {
+    "id": "emp-003",
+    "type": "Employment",
+    "category": "ip_assignment",
+    "title": "Work Product IP Assignment - Standard",
+    "text": "Employee hereby assigns to the Company all right, title, and interest in any inventions, discoveries, designs, or works of authorship created by Employee within the scope of employment or using Company resources. Employee retains all rights to inventions developed entirely on Employee's own time without use of Company resources and unrelated to the Company's business.",
+    "risk_level": "low",
+    "notes": "Balanced IP assignment. Clear scope limitation to work-related inventions. Carve-out for personal projects is important and required in some states (e.g., California)."
+  },
+  {
+    "id": "emp-004",
+    "type": "Employment",
+    "category": "ip_assignment",
+    "title": "Overreaching IP Assignment",
+    "text": "Employee irrevocably assigns to the Company all intellectual property rights in any and all works, inventions, ideas, concepts, discoveries, and improvements, whether or not patentable, conceived or developed by Employee at any time during the term of employment, regardless of whether such intellectual property was created during working hours or using Company resources.",
+    "risk_level": "high",
+    "notes": "Overreaching - claims all IP regardless of when or how created. Violates California Labor Code 2870 and similar state statutes. No carve-out for personal work."
+  },
+  {
+    "id": "svc-001",
+    "type": "Service Agreement",
+    "category": "limitation_of_liability",
+    "title": "Balanced Limitation of Liability",
+    "text": "In no event shall either party's aggregate liability under this Agreement exceed the total fees paid or payable by Client during the twelve (12) month period preceding the claim. Neither party shall be liable for any indirect, incidental, special, consequential, or punitive damages, regardless of the cause of action or theory of liability.",
+    "risk_level": "low",
+    "notes": "Standard mutual liability cap tied to fees paid. Mutual exclusion of consequential damages. Well-balanced for both parties."
+  },
+  {
+    "id": "svc-002",
+    "type": "Service Agreement",
+    "category": "limitation_of_liability",
+    "title": "One-Sided Liability Limitation",
+    "text": "Provider's total aggregate liability for all claims arising under or related to this Agreement shall not exceed the fees paid by Client in the one (1) month period prior to the event giving rise to liability. In no event shall Provider be liable for any loss of data, loss of profits, business interruption, or any indirect or consequential damages. Client shall indemnify and hold Provider harmless from any and all claims, damages, and expenses arising from Client's use of the Services.",
+    "risk_level": "high",
+    "notes": "Heavily favors provider. One-month liability cap is inadequate. Broad indemnification shifts nearly all risk to client. No mutual obligations."
+  },
+  {
+    "id": "svc-003",
+    "type": "Service Agreement",
+    "category": "termination",
+    "title": "Mutual Termination for Convenience",
+    "text": "Either party may terminate this Agreement for convenience upon thirty (30) days prior written notice to the other party. Upon termination, Client shall pay for all Services performed through the effective date of termination. Provider shall return or destroy all Client data within thirty (30) days of termination.",
+    "risk_level": "low",
+    "notes": "Fair termination clause. Mutual termination rights, reasonable notice period, clear obligations on termination."
+  },
+  {
+    "id": "svc-004",
+    "type": "Service Agreement",
+    "category": "termination",
+    "title": "Restrictive Termination - Provider Lock-In",
+    "text": "Client may terminate this Agreement only for cause, subject to a ninety (90) day cure period. Early termination by Client for any other reason shall require payment of all remaining fees due under the full term of this Agreement. Provider may terminate this Agreement at any time upon fifteen (15) days written notice.",
+    "risk_level": "high",
+    "notes": "Asymmetric termination rights. Client locked in with early termination penalty. Provider can exit freely. 90-day cure period is excessive."
+  },
+  {
+    "id": "nda-005",
+    "type": "NDA",
+    "category": "remedies",
+    "title": "Standard Remedies Clause",
+    "text": "Each party acknowledges that a breach of this Agreement may cause irreparable harm for which monetary damages would be an inadequate remedy. Accordingly, either party shall be entitled to seek equitable relief, including injunction and specific performance, in addition to all other remedies available at law or in equity.",
+    "risk_level": "low",
+    "notes": "Standard remedies clause for NDAs. Preserves right to injunctive relief without waiving other remedies."
+  },
+  {
+    "id": "svc-005",
+    "type": "Service Agreement",
+    "category": "data_protection",
+    "title": "Strong Data Protection Clause",
+    "text": "Provider shall implement and maintain appropriate technical and organizational security measures to protect Client Data against unauthorized access, disclosure, alteration, or destruction. Provider shall promptly notify Client of any data breach affecting Client Data, in no event later than seventy-two (72) hours after becoming aware of such breach. Provider shall not access, use, or process Client Data except as necessary to perform the Services.",
+    "risk_level": "low",
+    "notes": "Strong data protection provisions. 72-hour breach notification aligns with GDPR standards. Clear limitations on data use."
+  },
+  {
+    "id": "svc-006",
+    "type": "Service Agreement",
+    "category": "data_protection",
+    "title": "Weak Data Protection Clause",
+    "text": "Provider shall use commercially reasonable efforts to protect Client Data. Provider shall notify Client of any material data breach within a reasonable time after discovery. Provider may use aggregated and anonymized Client Data for any purpose, including improving its products and services.",
+    "risk_level": "medium",
+    "notes": "Vague protection standard. No specific breach notification timeline. Allows provider to use client data for own purposes even if anonymized. May not meet regulatory requirements."
+  }
+]
