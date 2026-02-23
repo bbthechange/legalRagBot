@@ -5,8 +5,12 @@ Given a query clause, find the most semantically similar clauses
 from the knowledge base using the configured vector store.
 """
 
+import logging
+
 import numpy as np
 from src.embeddings import get_embeddings
+
+logger = logging.getLogger(__name__)
 
 
 def search_similar_clauses(
@@ -27,6 +31,7 @@ def search_similar_clauses(
     Returns:
         List of dicts with 'clause' (original data) and 'score' (cosine similarity).
     """
+    logger.info("Searching for similar clauses (top_k=%d, filters=%s)", top_k, filters)
     query_embedding = get_embeddings([query], db["provider"])
 
     # L2 normalize using numpy (no FAISS dependency in retrieval layer)
@@ -59,6 +64,7 @@ def search_similar_clauses(
             "score": hit["score"],
         })
 
+    logger.info("Found %d similar clauses", len(results))
     return results
 
 

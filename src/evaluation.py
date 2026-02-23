@@ -7,10 +7,14 @@ and an LLM-as-Judge pattern for generation scoring.
 """
 
 import json
+import logging
 import time
+
 from src.embeddings import load_clause_database
 from src.retrieval import search_similar_clauses
 from src.rag_pipeline import analyze_clause
+
+logger = logging.getLogger(__name__)
 
 # Ground truth test cases for evaluation.
 # Each includes expected retrieval IDs, risk level, and required issues.
@@ -77,6 +81,7 @@ def evaluate_retrieval(db: dict, top_k: int = 3) -> dict:
     - Recall@k: Fraction of expected clauses found in top-k results
     - Mean Reciprocal Rank (MRR): Ranking quality of correct results
     """
+    logger.info("Evaluating retrieval with top_k=%d across %d test cases", top_k, len(TEST_CASES))
     results = {"test_cases": [], "recall_at_k": 0.0, "mrr": 0.0}
     total_recall = 0.0
     total_rr = 0.0
@@ -149,6 +154,7 @@ def evaluate_generation(db: dict, strategy: str = "few_shot") -> dict:
     actionability, and grounding. A stronger model (e.g. gpt-4o)
     could be used as the judge to reduce self-evaluation bias.
     """
+    logger.info("Evaluating generation with strategy=%s across %d test cases", strategy, len(TEST_CASES))
     results = {"test_cases": [], "strategy": strategy, "avg_scores": {}}
     all_scores = {"risk_accuracy": [], "issue_coverage": [],
                   "actionability": [], "grounding": [], "total": []}

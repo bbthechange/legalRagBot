@@ -6,6 +6,7 @@ LLM provider) and upserting them into the configured vector store backend.
 """
 
 import json
+import logging
 import os
 
 import numpy as np
@@ -13,6 +14,8 @@ from dotenv import load_dotenv
 
 from src.provider import create_provider
 from src.vector_store import create_vector_store
+
+logger = logging.getLogger(__name__)
 
 # Load API key from .env file
 load_dotenv()
@@ -52,6 +55,7 @@ def load_clause_database(data_path: str = "data/clauses.json") -> dict:
     with open(data_path) as f:
         clauses = json.load(f)
 
+    logger.info("Loading %d clauses from %s", len(clauses), data_path)
     print(f"Loaded {len(clauses)} legal clauses")
 
     # Combine title + text for richer semantic representation
@@ -84,6 +88,7 @@ def load_clause_database(data_path: str = "data/clauses.json") -> dict:
         })
 
     count = store.upsert(ids, embeddings, metadata)
+    logger.info("Vector store loaded with %d vectors", count)
     print(f"Vector store ({provider_name}) loaded with {count} vectors")
 
     return {

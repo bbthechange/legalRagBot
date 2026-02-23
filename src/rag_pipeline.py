@@ -5,6 +5,8 @@ Connects retrieval and generation into a single pipeline:
 Retrieve similar clauses → Augment the prompt with context → Generate analysis.
 """
 
+import logging
+
 from src.embeddings import load_clause_database
 from src.retrieval import search_similar_clauses, format_retrieval_results
 from src.generation import (
@@ -13,6 +15,8 @@ from src.generation import (
     build_few_shot_prompt,
     generate_analysis,
 )
+
+logger = logging.getLogger(__name__)
 
 # Map strategy names to their prompt builders
 STRATEGIES = {
@@ -37,6 +41,7 @@ def analyze_clause(
     were used, similarity scores, strategy, model) for explainability
     and audit trail purposes.
     """
+    logger.info("Analyzing clause with strategy=%s, top_k=%d", strategy, top_k)
     retrieved = search_similar_clauses(clause_text, db, top_k=top_k)
     context = format_retrieval_results(retrieved)
 
@@ -47,6 +52,7 @@ def analyze_clause(
         messages, db["provider"], model=model, temperature=temperature
     )
 
+    logger.info("Analysis complete (strategy=%s, model=%s)", strategy, model or db["provider"].chat_model)
     return {
         "analysis": analysis,
         "retrieved_clauses": retrieved,

@@ -15,6 +15,7 @@ import argparse
 import os
 import sys
 
+from src.logging_config import setup_logging
 from src.embeddings import load_clause_database
 from src.rag_pipeline import analyze_clause, STRATEGIES
 from src.evaluation import (
@@ -126,6 +127,7 @@ def interactive_mode(db: dict):
 
 
 def main():
+    setup_logging()
     parser = argparse.ArgumentParser(description="Legal Contract Clause Analyzer")
     parser.add_argument("--evaluate", action="store_true",
                         help="Run the evaluation suite")

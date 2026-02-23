@@ -7,9 +7,12 @@ LLM backends. Each provider exposes the same two methods: embed() and chat().
 Selection via LLM_PROVIDER env var (default: "openai").
 """
 
+import logging
 import os
 import json
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 class OpenAIProvider:
@@ -22,8 +25,10 @@ class OpenAIProvider:
     def __init__(self):
         from openai import OpenAI
         self.client = OpenAI()
+        logger.info("Initialized OpenAI provider")
 
     def embed(self, texts: list[str]) -> np.ndarray:
+        logger.debug("Embedding %d texts via OpenAI", len(texts))
         response = self.client.embeddings.create(
             model=self.embedding_model,
             input=texts,
@@ -33,6 +38,7 @@ class OpenAIProvider:
 
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
+        logger.debug("Chat request to OpenAI model=%s", model or self.chat_model)
         response = self.client.chat.completions.create(
             model=model or self.chat_model,
             messages=messages,
@@ -71,8 +77,10 @@ class AzureOpenAIProvider:
             raise ValueError(
                 "Azure OpenAI requires AZURE_EMBEDDING_DEPLOYMENT and AZURE_CHAT_DEPLOYMENT env vars"
             )
+        logger.info("Initialized Azure OpenAI provider (endpoint=%s)", endpoint)
 
     def embed(self, texts: list[str]) -> np.ndarray:
+        logger.debug("Embedding %d texts via Azure OpenAI", len(texts))
         response = self.client.embeddings.create(
             model=self.embedding_model,
             input=texts,
@@ -82,6 +90,7 @@ class AzureOpenAIProvider:
 
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
+        logger.debug("Chat request to Azure OpenAI model=%s", model or self.chat_model)
         response = self.client.chat.completions.create(
             model=model or self.chat_model,
             messages=messages,
@@ -107,8 +116,10 @@ class BedrockProvider:
         self.chat_model = os.environ.get(
             "BEDROCK_CHAT_MODEL", "anthropic.claude-3-haiku-20240307-v1:0"
         )
+        logger.info("Initialized Bedrock provider (region=%s)", region)
 
     def embed(self, texts: list[str]) -> np.ndarray:
+        logger.debug("Embedding %d texts via Bedrock", len(texts))
         embeddings = []
         for text in texts:
             response = self.bedrock.invoke_model(
@@ -122,6 +133,7 @@ class BedrockProvider:
 
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
+        logger.debug("Chat request to Bedrock model=%s", model or self.chat_model)
         system_parts = []
         converse_messages = []
 
