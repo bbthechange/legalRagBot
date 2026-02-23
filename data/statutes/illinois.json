@@ -1,0 +1,43 @@
+{
+  "jurisdiction": "Illinois",
+  "jurisdiction_abbr": "IL",
+  "statute_citation": "815 ILCS 530/1 et seq. (Personal Information Protection Act)",
+  "effective_date": "2020-01-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license number or state ID card number, financial account number or credit/debit card number (with access code)",
+    "Medical information (any diagnosis, preventive treatment, or treatment by a health care professional)",
+    "Health insurance information (policy number, subscriber ID, unique identifier)",
+    "Unique biometric data (fingerprint, retina, iris image, voice print, hand scan, or other unique biological characteristic)",
+    "Username or email address combined with password or security question and answer"
+  ],
+  "breach_definition": "Unauthorized acquisition of computerized data that compromises the security, confidentiality, or integrity of personal information maintained by the data collector. Good faith acquisition by an employee or agent is not a breach if the personal information is not used or subject to further unauthorized disclosure.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if personal information was encrypted or redacted, unless the encryption key was also acquired in the breach.",
+  "notification_timeline": "In the most expedient time possible and without unreasonable delay",
+  "notification_timeline_days": null,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 500,
+    "credit_reporting_agencies": true,
+    "cra_threshold": 1000,
+    "other_agencies": []
+  },
+  "notification_content_requirements": [
+    "A description of the breach in general terms",
+    "The type of personal information that was subject to the unauthorized access or acquisition",
+    "Steps the entity has taken to protect personal information from further breaches",
+    "Contact information for the entity, including a telephone number for further information and assistance",
+    "Contact information for the three major credit reporting agencies",
+    "Advice to the individual to be vigilant by reviewing account statements, monitoring credit reports, and providing information about security freezes"
+  ],
+  "private_right_of_action": true,
+  "penalties": "AG enforcement. Civil penalties up to $50,000 per violation, up to $100,000 for intentional violations. Private right of action: actual damages. Biometric data breaches under BIPA (740 ILCS 14) carry liquidated damages of $1,000 per negligent violation and $5,000 per intentional/reckless violation.",
+  "special_provisions": [
+    "Illinois BIPA (740 ILCS 14) provides separate and significant protections for biometric information with a private right of action",
+    "BIPA requires written consent before collecting biometric identifiers and requires published retention/destruction policies",
+    "BIPA has been the source of extensive class action litigation with substantial settlements",
+    "Data collector must notify AG if more than 500 Illinois residents are affected",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}

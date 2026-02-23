@@ -7,7 +7,7 @@ from src.rag_pipeline import STRATEGIES, analyze_clause
 
 class TestStrategies:
     def test_has_expected_keys(self):
-        assert set(STRATEGIES.keys()) == {"basic", "structured", "few_shot"}
+        assert set(STRATEGIES.keys()) == {"basic", "structured", "few_shot", "knowledge_base_qa"}
         for fn in STRATEGIES.values():
             assert callable(fn)
 

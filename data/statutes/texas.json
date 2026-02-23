@@ -1,0 +1,39 @@
+{
+  "jurisdiction": "Texas",
+  "jurisdiction_abbr": "TX",
+  "statute_citation": "Tex. Bus. & Com. Code 521.002, 521.053",
+  "effective_date": "2019-01-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license number or government-issued ID number, financial account number or credit/debit card number (with access code)",
+    "Information that identifies an individual and relates to the physical or mental health or condition of the individual, provision of health care to the individual, or payment for provision of health care",
+    "Unique biometric data (fingerprint, voice print, retina or iris image, other unique physical representation or digital representation)"
+  ],
+  "breach_definition": "Unauthorized acquisition of computerized data that compromises the security, confidentiality, or integrity of sensitive personal information maintained by a person. Good faith acquisition by employee or agent is not a breach if the information is not used or disclosed in an unauthorized manner.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if the sensitive personal information was encrypted and the encryption key was not acquired by an unauthorized person, unless it is reasonably believed that the sensitive personal information could be compromised by the unauthorized person.",
+  "notification_timeline": "As quickly as possible without unreasonable delay, not later than 60 days after the breach is discovered",
+  "notification_timeline_days": 60,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 250,
+    "credit_reporting_agencies": true,
+    "cra_threshold": 10000,
+    "other_agencies": []
+  },
+  "notification_content_requirements": [
+    "Description of the nature of the breach",
+    "Types of personal information involved",
+    "Steps taken to protect against further unauthorized acquisition",
+    "Contact information for further questions",
+    "Advice directing the individual to remain vigilant by reviewing account statements and monitoring credit reports"
+  ],
+  "private_right_of_action": false,
+  "penalties": "AG enforcement. Civil penalties: $2,000 to $50,000 per violation under Deceptive Trade Practices Act. Injunctive relief. No private right of action under the breach notification statute itself.",
+  "special_provisions": [
+    "Amended in 2019 to require notification to AG if 250+ individuals affected",
+    "Must use prescribed electronic form for AG notification",
+    "If breach affects 10,000+ individuals, must also notify consumer reporting agencies",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}

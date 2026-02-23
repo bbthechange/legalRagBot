@@ -14,6 +14,7 @@ from src.generation import (
     build_basic_prompt,
     build_structured_prompt,
     build_few_shot_prompt,
+    build_knowledge_base_qa_prompt,
     generate_analysis,
 )
 
@@ -24,6 +25,7 @@ STRATEGIES = {
     "basic": build_basic_prompt,
     "structured": build_structured_prompt,
     "few_shot": build_few_shot_prompt,
+    "knowledge_base_qa": build_knowledge_base_qa_prompt,
 }
 
 _DISCLAIMER = (

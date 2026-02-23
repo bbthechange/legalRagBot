@@ -147,6 +147,42 @@ SIMILAR CLAUSES FROM KNOWLEDGE BASE:
     return messages
 
 
+# --- Strategy 4: Knowledge Base QA (unified search) ---
+
+KNOWLEDGE_BASE_QA_PROMPT = """You are a legal knowledge base assistant. Answer the user's question based ONLY on the retrieved documents below.
+
+Rules:
+- Answer the specific question asked
+- Cite sources by their IDs in square brackets (e.g., [statute-ca-summary])
+- If the retrieved documents don't contain enough information to fully answer, say so explicitly
+- Do not make up or infer legal requirements not supported by the sources
+- If comparing across jurisdictions or clause types, organize the answer clearly
+
+Retrieved documents:
+{retrieved_context}
+
+Respond in JSON:
+{{
+    "answer": "Your answer to the question, with [source-id] citations inline",
+    "sources_used": [
+        {{"id": "doc-id", "title": "doc title", "relevance": "why this source was relevant"}}
+    ],
+    "confidence": "high | medium | low",
+    "caveats": ["Any important limitations or assumptions"],
+    "related_queries": ["2-3 follow-up questions the user might want to ask"]
+}}"""
+
+
+def build_knowledge_base_qa_prompt(query: str, retrieved_context: str) -> list[dict]:
+    """Knowledge base question-answering prompt with citation requirements."""
+    return [
+        {"role": "system", "content": KNOWLEDGE_BASE_QA_PROMPT.format(
+            retrieved_context=retrieved_context
+        )},
+        {"role": "user", "content": query},
+    ]
+
+
 def generate_analysis(
     messages: list[dict],
     provider,

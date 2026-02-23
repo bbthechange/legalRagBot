@@ -151,6 +151,10 @@ def main():
                         help="Compare all prompt strategies")
     parser.add_argument("--review", action="store_true",
                         help="Interactive playbook-driven contract review")
+    parser.add_argument("--breach", action="store_true",
+                        help="Run breach notification analysis")
+    parser.add_argument("--kb", action="store_true",
+                        help="Interactive knowledge base search")
     args = parser.parse_args()
 
     print("Initializing knowledge base...")
@@ -165,6 +169,106 @@ def main():
         print("\nComparing prompt strategies (this will take a minute)...")
         comparison = compare_strategies(db)
         print_comparison_results(comparison)
+
+    elif args.breach:
+        from src.breach_analysis import generate_breach_report
+
+        print("\n--- Data Breach Response Accelerator ---")
+        print("Enter breach parameters:\n")
+
+        # Collect breach parameters interactively
+        data_types = input("Data types compromised (comma-separated, e.g., ssn,email,financial): ").strip().split(",")
+        data_types = [dt.strip() for dt in data_types if dt.strip()]
+
+        states = input("Affected states (comma-separated abbreviations, e.g., CA,NY,TX): ").strip().split(",")
+        states = [s.strip().upper() for s in states if s.strip()]
+
+        num_affected = input("Number of affected individuals (or 'unknown'): ").strip()
+        encryption = input("Encryption status (encrypted/unencrypted/partial/unknown): ").strip()
+
+        breach_params = {
+            "data_types_compromised": data_types,
+            "affected_states": states,
+            "number_of_affected_individuals": int(num_affected) if num_affected.isdigit() else num_affected,
+            "encryption_status": encryption or "unknown",
+        }
+
+        print(f"\nAnalyzing breach notification requirements for {len(states)} states...")
+        report = generate_breach_report(breach_params, db)
+
+        # Display report
+        print(f"\n{'=' * 60}")
+        print(f"  DRAFT BREACH RESPONSE ANALYSIS")
+        print(f"  {report.get('disclaimer', '')}")
+        print(f"{'=' * 60}")
+
+        summary = report.get("summary", {})
+        print(f"\n--- Summary ---")
+        print(f"  Jurisdictions analyzed: {summary.get('total_jurisdictions', 0)}")
+        print(f"  Notifications required: {summary.get('notifications_required', 0)}")
+        print(f"  Earliest deadline: {summary.get('earliest_deadline', 'N/A')}")
+        print(f"  AG notifications: {summary.get('ag_notifications_required', [])}")
+
+        for analysis in report.get("state_analyses", []):
+            if isinstance(analysis, dict):
+                jurisdiction = analysis.get("jurisdiction", "Unknown")
+                required = analysis.get("notification_required", "Unknown")
+                deadline = analysis.get("deadline", "N/A")
+                print(f"\n--- {jurisdiction} ---")
+                print(f"  Notification required: {required}")
+                print(f"  Deadline: {deadline}")
+                if analysis.get("special_considerations"):
+                    for note in analysis["special_considerations"]:
+                        print(f"  * {note}")
+
+    elif args.kb:
+        from src.kb_search import search_knowledge_base
+
+        print("\n" + "=" * 60)
+        print("  LEGAL KNOWLEDGE BASE")
+        print("  Ask questions about contracts, breach notification, playbooks")
+        print("  Type 'quit' to exit")
+        print("=" * 60)
+
+        while True:
+            query = input("\n> ").strip()
+            if query.lower() in ("quit", "q", "exit"):
+                break
+            if not query:
+                continue
+
+            result = search_knowledge_base(query, db)
+
+            # Show routing info
+            routing = result.get("routing", {})
+            print(f"\n[Routed to: {routing.get('query_type', 'N/A')} | "
+                  f"Strategy: {routing.get('search_strategy', 'N/A')} | "
+                  f"Filters: {routing.get('filters', {})}]")
+
+            # Show answer
+            answer = result["answer"]
+            if isinstance(answer, dict):
+                print(f"\n{answer.get('answer', 'No answer generated.')}")
+
+                if answer.get("caveats"):
+                    print("\nCaveats:")
+                    for caveat in answer["caveats"]:
+                        print(f"  * {caveat}")
+
+                if answer.get("related_queries"):
+                    print("\nYou might also ask:")
+                    for rq in answer["related_queries"]:
+                        print(f"  - {rq}")
+            else:
+                print(f"\n{answer}")
+
+            # Show sources
+            print(f"\n--- Sources ({len(result['sources'])}) ---")
+            for s in result["sources"]:
+                print(f"  [{s['id']}] {s['title']} "
+                      f"(score: {s['score']:.3f}, {s.get('source', '')}/{s.get('doc_type', '')})")
+
+            print(f"\n{result['disclaimer']}")
 
     elif args.review:
         from glob import glob

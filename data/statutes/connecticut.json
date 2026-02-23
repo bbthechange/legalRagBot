@@ -1,0 +1,45 @@
+{
+  "jurisdiction": "Connecticut",
+  "jurisdiction_abbr": "CT",
+  "statute_citation": "Conn. Gen. Stat. 36a-701b",
+  "effective_date": "2023-10-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license number or state ID number, financial account number or credit/debit card number (with access code), passport number, military ID number, individual taxpayer identification number",
+    "Medical information, health insurance policy number, subscriber ID, or unique identifier",
+    "Biometric information (fingerprint, voice print, retina or iris image, or other unique physical representation)",
+    "Username or email address combined with password or security question and answer"
+  ],
+  "breach_definition": "Unauthorized access to or acquisition of electronic files, media, databases, or computerized data containing personal information when access to the personal information has not been secured by encryption or by any other method or technology that renders the personal information unreadable or unusable.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if data was secured by encryption or other method rendering it unreadable or unusable, unless the person or entity reasonably believes the key was also compromised.",
+  "notification_timeline": "Not later than 60 days after the discovery of the breach",
+  "notification_timeline_days": 60,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 0,
+    "credit_reporting_agencies": false,
+    "cra_threshold": null,
+    "other_agencies": []
+  },
+  "notification_content_requirements": [
+    "Description of the incident in general terms",
+    "Approximate date of the breach",
+    "Type of personal information that was or is reasonably believed to have been breached",
+    "Steps the entity has taken to protect against further breaches",
+    "Contact telephone number for the entity",
+    "Advice to individuals to monitor their credit reports and accounts",
+    "Information on how to place a fraud alert and security freeze with the credit reporting agencies",
+    "Contact information for the AG and FTC"
+  ],
+  "private_right_of_action": true,
+  "penalties": "AG enforcement. Civil penalties up to $5,000 per violation. Private right of action available under Connecticut Unfair Trade Practices Act (CUTPA) with actual damages, punitive damages, and attorney fees.",
+  "special_provisions": [
+    "2023 amendments (effective October 2023) expanded PI definition and added 60-day deadline",
+    "Connecticut Data Privacy Act (CTDPA, effective July 2023) adds comprehensive privacy requirements",
+    "Must notify AG regardless of number affected (no threshold for AG notification)",
+    "Entity must offer appropriate identity theft prevention services and mitigation services at no cost for not less than 24 months if SSN is compromised",
+    "Expanded from prior 90-day deadline to 60 days in 2023 amendments",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}

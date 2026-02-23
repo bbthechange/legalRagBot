@@ -1,0 +1,41 @@
+{
+  "jurisdiction": "Massachusetts",
+  "jurisdiction_abbr": "MA",
+  "statute_citation": "Mass. Gen. Laws ch. 93H; 201 CMR 17.00",
+  "effective_date": "2019-04-11",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license number, state ID card number, financial account number or credit/debit card number (with or without access code if breach could provide access)"
+  ],
+  "breach_definition": "Unauthorized acquisition or use of unencrypted data or encrypted electronic data and the confidential process or key that is capable of compromising the security, confidentiality, or integrity of personal information, maintained by a person or agency, that creates a substantial risk of identity theft or fraud.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if data was encrypted and the encryption key was not compromised. Applies to data that has been rendered unreadable through encryption.",
+  "notification_timeline": "As soon as practicable and without unreasonable delay",
+  "notification_timeline_days": null,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 0,
+    "credit_reporting_agencies": false,
+    "cra_threshold": null,
+    "other_agencies": ["Massachusetts Office of Consumer Affairs and Business Regulation (OCABR)"]
+  },
+  "notification_content_requirements": [
+    "The nature of the breach of security or unauthorized acquisition or use",
+    "The number of residents affected at the time of notification",
+    "Name of the person or agency experiencing the breach",
+    "Steps already taken relative to the incident",
+    "Whether a law enforcement agency is investigating the breach",
+    "Contact information for the reporting entity",
+    "The nature of personal information compromised"
+  ],
+  "private_right_of_action": true,
+  "penalties": "AG enforcement under Consumer Protection Act (Ch. 93A). Civil penalties up to $5,000 per violation. Private right of action under Ch. 93A: actual damages, treble damages for willful violations, plus attorney fees and costs.",
+  "special_provisions": [
+    "Must notify AG and OCABR regardless of number of individuals affected (no threshold)",
+    "201 CMR 17.00 requires comprehensive Written Information Security Program (WISP)",
+    "WISP requirements include encryption of PII transmitted over public networks and stored on portable devices",
+    "One of the strictest data security regulation regimes in the US",
+    "Must include whether entity maintains a WISP in the AG notification",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}

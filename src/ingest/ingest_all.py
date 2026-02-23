@@ -33,11 +33,13 @@ def register_ingestors(sources: list[str] | None = None, max_cuad: int | None = 
     from src.ingest.clauses_json import ClausesJsonIngestor
     from src.ingest.cuad import CuadIngestor
     from src.ingest.playbooks import PlaybookIngestor
+    from src.ingest.statutes import StatuteIngestor
 
     available = {
         "clauses_json": lambda: ClausesJsonIngestor(),
         "cuad": lambda: CuadIngestor(max_docs=max_cuad),
         "common_paper": lambda: PlaybookIngestor(),
+        "statutes": lambda: StatuteIngestor(),
     }
 
     if sources:

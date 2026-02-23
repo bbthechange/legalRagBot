@@ -23,6 +23,8 @@ from src.api_models import (
     SearchRequest, SearchResponse, SearchResult,
     HealthResponse, ErrorResponse, SourceInfo,
     ContractReviewRequest, ContractReviewResponse,
+    BreachRequest, BreachResponse,
+    KBSearchRequest, KBSearchResponse,
 )
 from src.embeddings import load_clause_database
 from src.rag_pipeline import analyze_clause, STRATEGIES
@@ -120,11 +122,13 @@ def analyze(req: AnalyzeRequest, db: dict = Depends(get_db)):
     a risk analysis with citations. Output is always a draft
     requiring attorney review.
     """
-    if req.strategy not in STRATEGIES:
+    # knowledge_base_qa has different output semantics — use /ask instead
+    analyze_strategies = {k for k in STRATEGIES if k != "knowledge_base_qa"}
+    if req.strategy not in analyze_strategies:
         raise HTTPException(
             status_code=400,
             detail=f"Unknown strategy '{req.strategy}'. "
-                   f"Available: {list(STRATEGIES.keys())}"
+                   f"Available: {sorted(analyze_strategies)}"
         )
 
     logger.info(f"Analyze request: strategy={req.strategy}, top_k={req.top_k}")
@@ -185,6 +189,13 @@ def search(req: SearchRequest, db: dict = Depends(get_db)):
     )
 
 
+@app.post("/ask", response_model=KBSearchResponse, dependencies=[Depends(verify_api_key)])
+def ask(req: KBSearchRequest, db: dict = Depends(get_db)):
+    """Ask a natural language question across the full knowledge base."""
+    from src.kb_search import search_knowledge_base
+    return search_knowledge_base(req.query, db, top_k=req.top_k, use_router=req.use_router)
+
+
 @app.post(
     "/contract-review",
     response_model=ContractReviewResponse,
@@ -224,6 +235,24 @@ def contract_review(req: ContractReviewRequest, db: dict = Depends(get_db)):
         review_status=result["review_status"],
         disclaimer=result["disclaimer"],
     )
+
+
+@app.post(
+    "/breach-analysis",
+    response_model=BreachResponse,
+    dependencies=[Depends(verify_api_key)],
+)
+def breach_analysis(req: BreachRequest, db: dict = Depends(get_db)):
+    """Analyze data breach notification requirements across jurisdictions."""
+    from src.breach_analysis import generate_breach_report
+
+    params = req.model_dump()
+    report = generate_breach_report(params, db)
+
+    if "error" in report:
+        raise HTTPException(status_code=400, detail=report)
+
+    return report
 
 
 # --- Entrypoint for python -m ---

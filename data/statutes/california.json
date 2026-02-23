@@ -1,0 +1,44 @@
+{
+  "jurisdiction": "California",
+  "jurisdiction_abbr": "CA",
+  "statute_citation": "Cal. Civ. Code 1798.29, 1798.82",
+  "effective_date": "2024-01-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license number, California ID card number, tax ID number, passport number, military ID number, or other unique government-issued ID number",
+    "First name or initial + last name combined with: financial account number, credit or debit card number (with required access code), medical information, health insurance information, unique biometric data generated from measurements of biological characteristics",
+    "Username or email address combined with password or security question and answer that would permit access to an online account",
+    "Genetic data"
+  ],
+  "breach_definition": "Unauthorized acquisition of computerized data that compromises the security, confidentiality, or integrity of personal information maintained by the person or business",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if data was encrypted and the encryption key was not acquired by an unauthorized person. Good faith acquisition by employee or agent is not a breach if used for lawful purpose.",
+  "notification_timeline": "In the most expedient time possible and without unreasonable delay",
+  "notification_timeline_days": null,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 500,
+    "credit_reporting_agencies": true,
+    "cra_threshold": 500,
+    "other_agencies": ["If health data: California Department of Public Health"]
+  },
+  "notification_content_requirements": [
+    "Name and contact information of the notifying entity",
+    "List of types of personal information that were or are reasonably believed to have been compromised",
+    "Date of the breach, estimated date, or date range",
+    "Date of the notice",
+    "Whether notification was delayed due to a law enforcement investigation",
+    "General description of the breach incident",
+    "Toll-free telephone numbers, addresses, and websites of the major credit reporting agencies (if applicable)",
+    "If breach involved credentials: advise changing password and security question/answer, or take other appropriate steps"
+  ],
+  "private_right_of_action": true,
+  "penalties": "Civil penalties up to $7,500 per violation under CCPA. AG enforcement. Private right of action for certain data breaches involving non-encrypted/non-redacted personal information under CCPA (Cal. Civ. Code 1798.150) with statutory damages of $100-$750 per consumer per incident.",
+  "special_provisions": [
+    "CCPA (Cal. Civ. Code 1798.150) provides additional private right of action for data breaches involving non-encrypted/non-redacted personal information",
+    "Must offer identity theft prevention and mitigation services for at least 12 months if SSN or driver's license number is compromised",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000 persons, or entity does not have sufficient contact information",
+    "Notification must be written in plain language and titled 'Notice of Data Breach'",
+    "Must use specific format prescribed by statute (heading, body content order)"
+  ]
+}

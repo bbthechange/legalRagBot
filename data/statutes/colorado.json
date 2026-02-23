@@ -1,0 +1,42 @@
+{
+  "jurisdiction": "Colorado",
+  "jurisdiction_abbr": "CO",
+  "statute_citation": "Colo. Rev. Stat. 6-1-716",
+  "effective_date": "2018-09-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license or state ID number, student/military/passport ID number, medical information, health insurance ID number, biometric data",
+    "Financial account number or credit/debit card number in combination with any required security code, access code, or password",
+    "Username or email address combined with a password or security questions and answers that would permit access to an online account"
+  ],
+  "breach_definition": "Unauthorized acquisition of unencrypted computerized data that compromises the security, confidentiality, or integrity of personal information maintained by an individual or commercial entity. Good faith acquisition by employee or agent is not a breach if used for lawful purpose and not further disclosed.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if personal information was encrypted and the encryption key was not also acquired. Redacted data is also exempt.",
+  "notification_timeline": "In the most expedient time possible and without unreasonable delay, but not later than 30 days after the date of determination that a security breach occurred",
+  "notification_timeline_days": 30,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 500,
+    "credit_reporting_agencies": true,
+    "cra_threshold": 1000,
+    "other_agencies": []
+  },
+  "notification_content_requirements": [
+    "Date or estimated date or date range of the security breach",
+    "Description of the personal information that was part of the breach",
+    "Contact information for the entity, including address, telephone number, and toll-free number if maintained",
+    "Toll-free numbers and addresses for the major credit reporting agencies",
+    "Toll-free number, address, and website for the FTC",
+    "Advice to the individual to review their account statements, monitor credit reports, and consider placing a fraud alert or security freeze"
+  ],
+  "private_right_of_action": false,
+  "penalties": "AG enforcement. Treated as a deceptive trade practice under the Colorado Consumer Protection Act. No specific statutory penalty amounts in the breach notification statute. Injunctive relief and standard CCPA remedies available.",
+  "special_provisions": [
+    "30-day notification deadline is among the shortest in the US (tied with Florida and Washington)",
+    "2018 amendments significantly strengthened requirements including the 30-day deadline",
+    "Colorado Privacy Act (effective July 2023) provides additional data protection requirements",
+    "Third-party service providers must notify the covered entity within the most expedient time possible",
+    "Must notify AG if 500+ Colorado residents are affected",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 250,000, or entity does not have sufficient contact information"
+  ]
+}

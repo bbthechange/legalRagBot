@@ -1,0 +1,42 @@
+{
+  "jurisdiction": "Virginia",
+  "jurisdiction_abbr": "VA",
+  "statute_citation": "Va. Code 18.2-186.6",
+  "effective_date": "2022-01-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN (full or last four digits with additional identifier), driver's license number or state ID number, financial account number or credit/debit card number (with access code), passport number, military ID number",
+    "Username or email address combined with password or security question and answer to an online account",
+    "Health information or health insurance information as defined by HIPAA"
+  ],
+  "breach_definition": "Unauthorized access and acquisition of unencrypted and unredacted computerized data that compromises the security or confidentiality of personal information maintained by an individual or entity as part of a database of personal information regarding multiple individuals, and that causes or is reasonably believed to cause identity theft or other fraud.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if data was encrypted or redacted, unless the individual or entity reasonably believes that the encryption key or security credential was also accessed or acquired.",
+  "notification_timeline": "Without unreasonable delay, no later than 60 days from discovery",
+  "notification_timeline_days": 60,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 0,
+    "credit_reporting_agencies": true,
+    "cra_threshold": 1000,
+    "other_agencies": []
+  },
+  "notification_content_requirements": [
+    "Description of the incident in general terms",
+    "Type of personal information subject to unauthorized access and acquisition",
+    "General acts taken to protect the personal information from further unauthorized access",
+    "Telephone number to call for further information and assistance",
+    "Advice to the individual to monitor their accounts and credit history for suspicious activity",
+    "Contact information for the AG's office"
+  ],
+  "private_right_of_action": false,
+  "penalties": "AG enforcement. Civil penalties up to $150,000 per breach, or up to $150,000 for violations involving failure to notify. Injunctive relief available. No private right of action under the breach notification statute.",
+  "special_provisions": [
+    "Must notify AG regardless of number affected (no threshold for AG notification)",
+    "Virginia Consumer Data Protection Act (VCDPA, effective 2023) adds comprehensive data privacy requirements",
+    "60-day notification deadline",
+    "Requires risk of harm analysis — notification only required if breach causes or is reasonably believed to cause identity theft or fraud",
+    "Tax ID numbers (including SSN with last four digits) are covered",
+    "Substitute notice allowed if cost exceeds $50,000, or affected class exceeds 100,000, or entity does not have sufficient contact information"
+  ]
+}

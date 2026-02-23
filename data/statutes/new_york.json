@@ -1,0 +1,44 @@
+{
+  "jurisdiction": "New York",
+  "jurisdiction_abbr": "NY",
+  "statute_citation": "N.Y. Gen. Bus. Law 899-aa; N.Y. State Tech. Law 208",
+  "effective_date": "2020-03-21",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license number or non-driver ID card number, financial account number or credit/debit card number (with or without access code if account could be accessed)",
+    "Username or email address combined with password or security question and answer",
+    "Biometric information (fingerprint, voice print, retina image, other unique physical or digital representation)",
+    "HIPAA-covered medical information or health insurance information"
+  ],
+  "breach_definition": "Unauthorized acquisition or access of computerized data that compromises the security, confidentiality, or integrity of private information maintained by a business. Good faith acquisition by employee or agent is not a breach if information is not used or further disclosed.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if data elements were encrypted and the encryption key was not also acquired. Applies to data that was encrypted, redacted, or otherwise rendered unusable.",
+  "notification_timeline": "In the most expedient time possible and without unreasonable delay",
+  "notification_timeline_days": null,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 0,
+    "credit_reporting_agencies": false,
+    "cra_threshold": null,
+    "other_agencies": [
+      "New York State Division of State Police",
+      "New York Department of State (Division of Consumer Protection)"
+    ]
+  },
+  "notification_content_requirements": [
+    "Contact information for the person or business making the notification",
+    "Telephone numbers and websites for the three major credit reporting agencies",
+    "Toll-free number and website for the FTC",
+    "Toll-free number, website, and address for the New York AG's office and the Division of State Police",
+    "Description of the categories of information believed to have been compromised",
+    "Description of the breach incident in general terms"
+  ],
+  "private_right_of_action": true,
+  "penalties": "AG enforcement with civil penalties up to $5,000 per violation (up to $150,000 total). Private right of action: actual damages or $50 minimum damages per instance, plus reasonable attorney fees. Court may treble damages up to $1,000 per instance for knowing or reckless violations.",
+  "special_provisions": [
+    "Must notify AG, State Police, and Division of Consumer Protection within specified timeline regardless of number affected (no threshold)",
+    "The SHIELD Act (2020) expanded definition of private information and broadened applicability to any person or business that owns or licenses data of NY residents",
+    "Reasonable security safeguards requirement (administrative, technical, and physical) codified in the SHIELD Act",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}

@@ -103,6 +103,79 @@ class ErrorResponse(BaseModel):
     detail: str = ""
 
 
+# --- Breach Analysis ---
+
+class BreachRequest(BaseModel):
+    """Request body for breach notification analysis."""
+    data_types_compromised: list[str] = Field(
+        ..., min_length=1,
+        description="Types of data compromised (e.g., ['ssn', 'email', 'financial'])"
+    )
+    affected_states: list[str] = Field(
+        ..., min_length=1,
+        description="State abbreviations (e.g., ['CA', 'NY', 'TX'])"
+    )
+    number_of_affected_individuals: int | str = Field(
+        default="unknown",
+        description="Number of affected individuals or 'unknown'"
+    )
+    encryption_status: str = Field(
+        default="unknown",
+        description="Encryption status: encrypted, unencrypted, partial, unknown"
+    )
+    entity_type: str = Field(default="for_profit")
+    industry: str | None = Field(default=None)
+    date_of_discovery: str | None = Field(default=None)
+
+
+class BreachStateAnalysis(BaseModel):
+    """Analysis result for a single state."""
+    jurisdiction: str
+    notification_required: bool | None = None
+    rationale: str = ""
+    deadline: str = ""
+    notify_ag: bool | None = None
+    ag_notification_details: str = ""
+    safe_harbor_applies: bool | None = None
+    special_considerations: list[str] = []
+    confidence: str = "medium"
+
+
+class BreachSummary(BaseModel):
+    """Cross-jurisdiction summary of breach analysis."""
+    total_jurisdictions: int
+    notifications_required: int
+    ag_notifications_required: list[str] = []
+    earliest_deadline: str = ""
+
+
+class BreachResponse(BaseModel):
+    """Response from breach notification analysis."""
+    breach_params: dict
+    summary: BreachSummary
+    state_analyses: list[dict]  # Flexible since LLM output varies
+    review_status: str = "pending_review"
+    disclaimer: str
+
+
+# --- Knowledge Base Search ---
+
+class KBSearchRequest(BaseModel):
+    """Request body for knowledge base search."""
+    query: str = Field(..., min_length=3, description="Natural language question")
+    top_k: int = Field(default=5, ge=1, le=20)
+    use_router: bool = Field(default=True, description="Use query router for intelligent search")
+
+
+class KBSearchResponse(BaseModel):
+    """Response from knowledge base search."""
+    answer: dict | str
+    routing: dict
+    sources: list[dict]
+    review_status: str = "pending_review"
+    disclaimer: str
+
+
 # --- Contract Review ---
 
 class ContractReviewRequest(BaseModel):

@@ -1,0 +1,42 @@
+{
+  "jurisdiction": "Florida",
+  "jurisdiction_abbr": "FL",
+  "statute_citation": "Fla. Stat. 501.171",
+  "effective_date": "2014-07-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license or state ID number, passport number, military ID number, or other similar number on a government document used to verify identity",
+    "Financial account number or credit/debit card number in combination with any required security code, access code, or password to access the account",
+    "Medical history, mental or physical condition, or treatment or diagnosis by a health care professional",
+    "Health insurance policy number or subscriber ID and unique identifier used by health insurer",
+    "Username or email address combined with password or security question and answer",
+    "Individual's health information as defined by HIPAA"
+  ],
+  "breach_definition": "Unauthorized access of data in electronic form containing personal information. Good faith access by employee or agent is not a breach, provided the information is not used for a purpose unrelated to the business or subject to further unauthorized use.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if personal information was encrypted, secured, or modified to remove elements that make it personally identifiable, unless the covered entity has reason to believe the encryption key or security credential was also accessed.",
+  "notification_timeline": "As expeditiously as practicable, but no later than 30 days after determination of the breach or reason to believe a breach occurred",
+  "notification_timeline_days": 30,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 500,
+    "credit_reporting_agencies": true,
+    "cra_threshold": 1000,
+    "other_agencies": ["Florida Department of Legal Affairs"]
+  },
+  "notification_content_requirements": [
+    "Date or estimated date or date range of the breach",
+    "Description of the personal information that was accessed or reasonably believed to have been accessed",
+    "Contact information for the reporting entity including mailing address, telephone number, and email address"
+  ],
+  "private_right_of_action": false,
+  "penalties": "AG enforcement. Civil penalties: $1,000 per day for first 30 days, $50,000 thereafter per 30-day period (up to 180 days). Violations affecting 500+ individuals: up to $500,000. No private right of action under the breach notification statute.",
+  "special_provisions": [
+    "One of the shortest notification deadlines in the US (30 days)",
+    "Requires notification to FDLE (Department of Legal Affairs) for breaches affecting 500+ individuals",
+    "Third-party agents must notify the covered entity within 10 days of the breach determination",
+    "Covered entity must provide a copy of the individual notification to the Department within 30 days",
+    "Risk of harm analysis is NOT available — notification required regardless of risk assessment",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}

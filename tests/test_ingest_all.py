@@ -10,7 +10,8 @@ def test_register_ingestors_no_args_returns_all():
     assert "clauses_json" in ingestors
     assert "cuad" in ingestors
     assert "common_paper" in ingestors
-    assert len(ingestors) == 3
+    assert "statutes" in ingestors
+    assert len(ingestors) == 4
 
 
 def test_register_ingestors_clauses_json_only():

@@ -1,0 +1,47 @@
+{
+  "jurisdiction": "Washington",
+  "jurisdiction_abbr": "WA",
+  "statute_citation": "Wash. Rev. Code 19.255.010, 19.255.020",
+  "effective_date": "2020-03-01",
+  "personal_information_definition": [
+    "First name or initial + last name combined with: SSN, driver's license or state ID number, financial account number or credit/debit card number (with access code)",
+    "Full date of birth",
+    "Private key that is unique to an individual and used to authenticate or sign an electronic record",
+    "Student, military, or passport ID number",
+    "Health insurance policy number or health insurance subscriber ID in combination with unique identifier",
+    "Medical history, mental or physical condition, or treatment or diagnosis by a health care professional",
+    "Biometric data generated from measurements of biological characteristics (fingerprints, retina patterns, iris patterns, voice or facial characteristics)",
+    "Username or email address combined with password or answer to a security question"
+  ],
+  "breach_definition": "Unauthorized acquisition of data that compromises the security, confidentiality, or integrity of personal information maintained by an individual or entity. Good faith acquisition by an employee or agent is not a breach if the personal information is not used or subject to further unauthorized disclosure.",
+  "encryption_safe_harbor": true,
+  "encryption_safe_harbor_details": "No notification required if the breach is not reasonably likely to subject consumers to a risk of harm. Encrypted data is excluded unless the encryption key was acquired. Notification not required if entity reasonably determines breach has not and is not reasonably likely to cause harm.",
+  "notification_timeline": "No more than 30 days after the breach was discovered",
+  "notification_timeline_days": 30,
+  "notification_recipients": {
+    "individuals": true,
+    "attorney_general": true,
+    "ag_threshold": 500,
+    "credit_reporting_agencies": true,
+    "cra_threshold": null,
+    "other_agencies": []
+  },
+  "notification_content_requirements": [
+    "Name and contact information of the reporting person or business",
+    "List of types of personal information subject to the breach",
+    "Timeframe of exposure, if known",
+    "Steps taken to contain the breach",
+    "Toll-free number and address for the AG's office",
+    "Toll-free number, address, and website for the three major credit reporting agencies",
+    "Advice regarding the FTC and steps to guard against identity theft"
+  ],
+  "private_right_of_action": true,
+  "penalties": "AG enforcement under the Consumer Protection Act (RCW 19.86). Civil penalties up to $7,500 per violation. Private right of action: actual damages, treble damages possible under CPA, plus attorney fees.",
+  "special_provisions": [
+    "2020 amendments significantly expanded the definition of personal information and added 30-day notification deadline",
+    "Must notify AG within 30 days if breach affects 500+ Washington residents",
+    "Includes unique categories like private keys for digital signatures and full date of birth",
+    "Entities must implement and maintain reasonable security procedures",
+    "Substitute notice allowed if cost exceeds $250,000, or affected class exceeds 500,000, or entity does not have sufficient contact information"
+  ]
+}
