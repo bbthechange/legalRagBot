@@ -2,11 +2,10 @@
 Retrieval Module — Finding Similar Legal Clauses
 
 Given a query clause, find the most semantically similar clauses
-from the knowledge base using FAISS vector search.
+from the knowledge base using the configured vector store.
 """
 
 import numpy as np
-import faiss
 from src.embeddings import get_embeddings
 
 
@@ -14,6 +13,7 @@ def search_similar_clauses(
     query: str,
     db: dict,
     top_k: int = 3,
+    filters: dict[str, str] | None = None,
 ) -> list[dict]:
     """
     Find the most similar clauses to a query string.
@@ -22,21 +22,41 @@ def search_similar_clauses(
         query: The clause text to analyze
         db: The database dict from load_clause_database()
         top_k: Number of similar clauses to return
+        filters: Optional metadata filters (e.g. {"type": "NDA"})
 
     Returns:
         List of dicts with 'clause' (original data) and 'score' (cosine similarity).
-        Could be extended with score threshold filtering or metadata filters.
     """
     query_embedding = get_embeddings([query], db["provider"])
-    faiss.normalize_L2(query_embedding)
-    scores, indices = db["index"].search(query_embedding, top_k)
+
+    # L2 normalize using numpy (no FAISS dependency in retrieval layer)
+    norm = np.linalg.norm(query_embedding, axis=1, keepdims=True)
+    norm = np.maximum(norm, 1e-12)
+    query_embedding = query_embedding / norm
+
+    store_results = db["store"].search(query_embedding, top_k, filters)
+
+    # Reconstruct clause dicts from store results
+    clause_lookup = {c["id"]: c for c in db["clauses"]}
+
     results = []
-    for score, idx in zip(scores[0], indices[0]):
-        if idx == -1:  # FAISS returns -1 for empty slots
-            continue
+    for hit in store_results:
+        clause = clause_lookup.get(hit["id"])
+        if clause is None:
+            # Fall back to metadata for Pinecone-only documents
+            meta = hit["metadata"]
+            clause = {
+                "id": hit["id"],
+                "title": meta.get("title", ""),
+                "type": meta.get("type", ""),
+                "category": meta.get("category", ""),
+                "text": meta.get("text", ""),
+                "risk_level": meta.get("risk_level", ""),
+                "notes": meta.get("notes", ""),
+            }
         results.append({
-            "clause": db["clauses"][idx],
-            "score": float(score),
+            "clause": clause,
+            "score": hit["score"],
         })
 
     return results

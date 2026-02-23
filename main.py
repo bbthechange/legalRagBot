@@ -12,6 +12,7 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 
 from src.embeddings import load_clause_database
@@ -52,9 +53,10 @@ SAMPLE_CLAUSES = {
 def interactive_mode(db: dict):
     """Run the interactive clause analysis loop."""
     provider_name = db["provider"].provider_name
+    store_name = os.environ.get("VECTOR_STORE_PROVIDER", "faiss").upper()
     print("\n" + "=" * 60)
     print("  LEGAL CONTRACT CLAUSE ANALYZER")
-    print(f"  Powered by RAG (FAISS + {provider_name})")
+    print(f"  Powered by RAG ({store_name} + {provider_name})")
     print("=" * 60)
 
     while True:

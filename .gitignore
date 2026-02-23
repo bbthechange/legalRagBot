@@ -15,6 +15,10 @@ build/
 # FAISS index artifacts
 data/faiss_index/
 
+# Persisted indexes and external data
+data/external/
+data/index/
+
 # Claude Code config
 .claude/
 
