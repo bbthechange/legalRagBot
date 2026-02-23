@@ -51,9 +51,10 @@ SAMPLE_CLAUSES = {
 
 def interactive_mode(db: dict):
     """Run the interactive clause analysis loop."""
+    provider_name = db["provider"].provider_name
     print("\n" + "=" * 60)
     print("  LEGAL CONTRACT CLAUSE ANALYZER")
-    print("  Powered by RAG (FAISS + OpenAI)")
+    print(f"  Powered by RAG (FAISS + {provider_name})")
     print("=" * 60)
 
     while True:

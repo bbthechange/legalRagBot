@@ -27,7 +27,7 @@ def search_similar_clauses(
         List of dicts with 'clause' (original data) and 'score' (cosine similarity).
         Could be extended with score threshold filtering or metadata filters.
     """
-    query_embedding = get_embeddings([query], db["client"])
+    query_embedding = get_embeddings([query], db["provider"])
     faiss.normalize_L2(query_embedding)
     scores, indices = db["index"].search(query_embedding, top_k)
     results = []

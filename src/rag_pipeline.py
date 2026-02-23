@@ -27,7 +27,7 @@ def analyze_clause(
     db: dict,
     strategy: str = "few_shot",
     top_k: int = 3,
-    model: str = "gpt-4o-mini",
+    model: str | None = None,
     temperature: float = 0.2,
 ) -> dict:
     """
@@ -44,12 +44,12 @@ def analyze_clause(
     messages = prompt_builder(clause_text, context)
 
     analysis = generate_analysis(
-        messages, db["client"], model=model, temperature=temperature
+        messages, db["provider"], model=model, temperature=temperature
     )
 
     return {
         "analysis": analysis,
         "retrieved_clauses": retrieved,
         "strategy": strategy,
-        "model": model,
+        "model": model or db["provider"].chat_model,
     }

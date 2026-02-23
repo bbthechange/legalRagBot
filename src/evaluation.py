@@ -167,15 +167,11 @@ def evaluate_generation(db: dict, strategy: str = "few_shot") -> dict:
             )},
         ]
 
-        judge_response = db["client"].chat.completions.create(
-            model="gpt-4o-mini",
-            messages=judge_messages,
-            temperature=0.0,  # Deterministic judging
-        )
+        judge_response = db["provider"].chat(judge_messages, temperature=0.0)
 
         try:
-            scores = json.loads(judge_response.choices[0].message.content)
-        except json.JSONDecodeError:
+            scores = json.loads(judge_response)
+        except (json.JSONDecodeError, TypeError):
             scores = {"risk_accuracy": 0, "issue_coverage": 0,
                       "actionability": 0, "grounding": 0, "total": 0,
                       "notes": "Failed to parse judge response"}

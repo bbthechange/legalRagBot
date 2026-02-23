@@ -9,22 +9,17 @@ import json
 import numpy as np
 import faiss
 from dotenv import load_dotenv
-from openai import OpenAI
+from src.provider import create_provider
 
 # Load API key from .env file
 load_dotenv()
 
-def get_embeddings(texts: list[str], client: OpenAI) -> np.ndarray:
+def get_embeddings(texts: list[str], provider) -> np.ndarray:
     """
-    Convert a list of text strings into vector embeddings via OpenAI's API.
-    Returns a float32 numpy array of shape (len(texts), 1536).
+    Convert a list of text strings into vector embeddings via the configured provider.
+    Returns a float32 numpy array with shape (len(texts), embedding_dim).
     """
-    response = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=texts
-    )
-    embeddings = [item.embedding for item in response.data]
-    return np.array(embeddings, dtype="float32")
+    return provider.embed(texts)
 
 
 def build_faiss_index(embeddings: np.ndarray) -> faiss.IndexFlatIP:
@@ -51,11 +46,11 @@ def load_clause_database(data_path: str = "data/clauses.json") -> dict:
     Returns a dict with:
     - 'index': the FAISS index for similarity search
     - 'clauses': the original clause data
-    - 'client': the OpenAI client (reused for query-time embedding)
+    - 'provider': the LLM provider (reused for query-time embedding and chat)
 
     In production, the index would be persisted and updated incrementally.
     """
-    client = OpenAI()
+    provider = create_provider()
 
     with open(data_path) as f:
         clauses = json.load(f)
@@ -68,8 +63,8 @@ def load_clause_database(data_path: str = "data/clauses.json") -> dict:
         for clause in clauses
     ]
 
-    print("Creating embeddings via OpenAI API...")
-    embeddings = get_embeddings(texts_to_embed, client)
+    print(f"Creating embeddings via {provider.provider_name}...")
+    embeddings = get_embeddings(texts_to_embed, provider)
     print(f"Created {len(embeddings)} embeddings of dimension {embeddings.shape[1]}")
 
     # Build the FAISS index
@@ -79,5 +74,5 @@ def load_clause_database(data_path: str = "data/clauses.json") -> dict:
     return {
         "index": index,
         "clauses": clauses,
-        "client": client,
+        "provider": provider,
     }

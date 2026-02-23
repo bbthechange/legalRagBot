@@ -5,7 +5,6 @@ Three prompt strategies for analyzing legal clauses, designed to be
 compared against each other via the evaluation framework.
 """
 
-from openai import OpenAI
 
 # --- Strategy 1: Basic (baseline) ---
 
@@ -129,22 +128,16 @@ SIMILAR CLAUSES FROM KNOWLEDGE BASE:
 
 def generate_analysis(
     messages: list[dict],
-    client: OpenAI,
-    model: str = "gpt-4o-mini",
+    provider,
+    model: str | None = None,
     temperature: float = 0.2,
+    max_tokens: int = 1500,
 ) -> str:
     """
     Send the prompt to the LLM and return the response.
 
     Temperature is kept low (0.2) for consistency — legal analysis
-    needs to be reproducible, not creative. Model defaults to
-    gpt-4o-mini for cost efficiency; gpt-4o could be benchmarked
-    for higher-stakes use cases.
+    needs to be reproducible, not creative. Model defaults to the
+    provider's chat_model for cost efficiency.
     """
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=1500,
-    )
-    return response.choices[0].message.content
+    return provider.chat(messages, model=model, temperature=temperature, max_tokens=max_tokens)
