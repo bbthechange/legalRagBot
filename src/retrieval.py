@@ -1,8 +1,9 @@
 """
-Retrieval Module — Finding Similar Legal Clauses
+Retrieval Module — Finding Similar Legal Documents
 
-Given a query clause, find the most semantically similar clauses
+Given a query, find the most semantically similar documents
 from the knowledge base using the configured vector store.
+Reconstructs all results from vector store metadata (source-agnostic).
 """
 
 import logging
@@ -24,12 +25,12 @@ def search_similar_clauses(
 
     Args:
         query: The clause text to analyze
-        db: The database dict from load_clause_database()
+        db: The database dict from load_clause_database() or load_documents()
         top_k: Number of similar clauses to return
         filters: Optional metadata filters (e.g. {"type": "NDA"})
 
     Returns:
-        List of dicts with 'clause' (original data) and 'score' (cosine similarity).
+        List of dicts with 'clause' (reconstructed from metadata) and 'score'.
     """
     logger.info("Searching for similar clauses (top_k=%d, filters=%s)", top_k, filters)
     query_embedding = get_embeddings([query], db["provider"])
@@ -41,24 +42,23 @@ def search_similar_clauses(
 
     store_results = db["store"].search(query_embedding, top_k, filters)
 
-    # Reconstruct clause dicts from store results
-    clause_lookup = {c["id"]: c for c in db["clauses"]}
-
     results = []
     for hit in store_results:
-        clause = clause_lookup.get(hit["id"])
-        if clause is None:
-            # Fall back to metadata for Pinecone-only documents
-            meta = hit["metadata"]
-            clause = {
-                "id": hit["id"],
-                "title": meta.get("title", ""),
-                "type": meta.get("type", ""),
-                "category": meta.get("category", ""),
-                "text": meta.get("text", ""),
-                "risk_level": meta.get("risk_level", ""),
-                "notes": meta.get("notes", ""),
-            }
+        meta = hit["metadata"]
+        clause = {
+            "id": hit["id"],
+            "title": meta.get("title", ""),
+            "type": meta.get("clause_type", meta.get("type", "")),
+            "category": meta.get("category", ""),
+            "text": meta.get("text", ""),
+            "risk_level": meta.get("risk_level", ""),
+            "notes": meta.get("notes", ""),
+            "source": meta.get("source", ""),
+            "doc_type": meta.get("doc_type", "clause"),
+            "jurisdiction": meta.get("jurisdiction", ""),
+            "citation": meta.get("citation", ""),
+            "position": meta.get("position", ""),
+        }
         results.append({
             "clause": clause,
             "score": hit["score"],
@@ -70,21 +70,40 @@ def search_similar_clauses(
 
 def format_retrieval_results(results: list[dict]) -> str:
     """
-    Format retrieved clauses into a readable string.
-    Used both for display and as context injected into LLM prompts.
-    Includes metadata (type, risk level, notes) to give the LLM
-    richer context for generating analysis.
+    Format retrieved documents into a readable string.
+    Uses doc_type to select the appropriate format branch.
     """
     output = []
-    for i, result in enumerate(results, 1):
-        clause = result["clause"]
+    for result in results:
+        doc = result["clause"]
         score = result["score"]
-        output.append(
-            f"--- Similar Clause {i} (similarity: {score:.3f}) ---\n"
-            f"Type: {clause['type']} | Category: {clause['category']}\n"
-            f"Title: {clause['title']}\n"
-            f"Risk Level: {clause['risk_level']}\n"
-            f"Text: {clause['text']}\n"
-            f"Attorney Notes: {clause['notes']}\n"
-        )
+        doc_type = doc.get("doc_type", "clause")
+
+        header = f"--- Source [{doc['id']}] (similarity: {score:.3f}) ---\n"
+
+        if doc_type == "statute":
+            body = (
+                f"Jurisdiction: {doc.get('jurisdiction', '')}\n"
+                f"Citation: {doc.get('citation', '')}\n"
+                f"Title: {doc['title']}\n"
+                f"Text: {doc['text']}\n"
+            )
+        elif doc_type == "playbook":
+            body = (
+                f"Playbook: {doc.get('source', '')}\n"
+                f"Title: {doc['title']}\n"
+                f"Position: {doc.get('position', '')}\n"
+            )
+        else:
+            # Default: clause format
+            body = (
+                f"Type: {doc['type']} | Category: {doc['category']}\n"
+                f"Title: {doc['title']}\n"
+                f"Risk Level: {doc['risk_level']}\n"
+                f"Text: {doc['text']}\n"
+                f"Attorney Notes: {doc['notes']}\n"
+            )
+
+        output.append(header + body)
+
     return "\n".join(output)

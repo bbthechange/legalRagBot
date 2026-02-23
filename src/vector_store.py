@@ -5,6 +5,7 @@ Provides a unified interface for vector similarity search with
 pluggable backends (FAISS for local dev, Pinecone for production).
 """
 
+import json
 import os
 import time
 from abc import ABC, abstractmethod
@@ -56,11 +57,12 @@ class VectorStore(ABC):
 class FaissVectorStore(VectorStore):
     """FAISS-backed vector store for local development."""
 
-    def __init__(self):
+    def __init__(self, index_dir: str | None = None):
         self._index = None
         self._ids: list[str] = []
         self._metadata: dict[str, dict] = {}
         self._deleted_ids: set[str] = set()
+        self._index_dir = index_dir
 
     def upsert(
         self,
@@ -135,6 +137,85 @@ class FaissVectorStore(VectorStore):
     @property
     def total_vectors(self) -> int:
         return self._index.ntotal if self._index else 0
+
+    def save(self, path: str | None = None, content_hash: str | None = None) -> str:
+        """Save the FAISS index and metadata to disk.
+
+        Args:
+            path: Base path (without extension). Defaults to self._index_dir
+                  or "data/index/main".
+            content_hash: Optional content fingerprint for staleness detection.
+
+        Returns:
+            The base path used.
+        """
+        import faiss
+
+        if self._index is None:
+            raise ValueError("Cannot save: no index has been built (call upsert first)")
+
+        if path is None:
+            path = self._index_dir or "data/index/main"
+
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+
+        faiss.write_index(self._index, f"{path}.index")
+
+        meta = {
+            "ids": self._ids,
+            "metadata": self._metadata,
+            "deleted_ids": list(self._deleted_ids),
+            "content_hash": content_hash,
+        }
+        with open(f"{path}.meta.json", "w") as f:
+            json.dump(meta, f)
+
+        return path
+
+    def load(self, path: str | None = None) -> bool:
+        """Load FAISS index and metadata from disk.
+
+        Args:
+            path: Base path (without extension). Defaults to self._index_dir
+                  or "data/index/main".
+
+        Returns:
+            True on success, False if files don't exist or are corrupted.
+        """
+        import faiss
+
+        if path is None:
+            path = self._index_dir or "data/index/main"
+
+        index_file = f"{path}.index"
+        meta_file = f"{path}.meta.json"
+
+        if not os.path.exists(index_file) or not os.path.exists(meta_file):
+            return False
+
+        try:
+            self._index = faiss.read_index(index_file)
+
+            with open(meta_file) as f:
+                meta = json.load(f)
+
+            if not all(k in meta for k in ("ids", "metadata", "deleted_ids")):
+                logging.getLogger(__name__).warning("Corrupted meta.json at %s", meta_file)
+                return False
+
+            self._ids = meta["ids"]
+            self._metadata = meta["metadata"]
+            self._deleted_ids = set(meta["deleted_ids"])
+            self._content_hash = meta.get("content_hash")
+        except (json.JSONDecodeError, KeyError, Exception) as e:
+            logging.getLogger(__name__).warning("Failed to load index from %s: %s", path, e)
+            return False
+
+        return True
+
+    def get_content_hash(self) -> str | None:
+        """Return the content hash from the last load(), or None."""
+        return getattr(self, "_content_hash", None)
 
 
 class PineconeVectorStore(VectorStore):

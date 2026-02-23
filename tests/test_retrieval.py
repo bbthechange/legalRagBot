@@ -44,26 +44,19 @@ class TestSearchSimilarClauses:
         for r in results:
             assert r["clause"]["type"] == "NDA"
 
-    def test_metadata_fallback(self, loaded_faiss_db):
-        """When a clause ID isn't in db['clauses'], reconstruct from metadata."""
-        original_clauses = loaded_faiss_db["clauses"]
-        removed = original_clauses[0]
-        loaded_faiss_db["clauses"] = [
-            c for c in original_clauses if c["id"] != removed["id"]
-        ]
-
+    def test_reconstructs_from_metadata(self, loaded_faiss_db):
+        """All results are reconstructed from vector store metadata."""
         results = search_similar_clauses(
-            f"{removed['title']}: {removed['text']}", loaded_faiss_db, top_k=15
+            "confidentiality agreement", loaded_faiss_db, top_k=3
         )
-
-        found = [r for r in results if r["clause"]["id"] == removed["id"]]
-        assert len(found) > 0, f"Expected to find {removed['id']} via metadata fallback"
-        clause = found[0]["clause"]
-        assert clause["title"] == removed["title"]
-        assert clause["text"] == removed["text"]
-
-        # Restore
-        loaded_faiss_db["clauses"] = original_clauses
+        for r in results:
+            clause = r["clause"]
+            assert "id" in clause
+            assert "title" in clause
+            assert "type" in clause
+            assert "text" in clause
+            assert "source" in clause
+            assert "doc_type" in clause
 
 
 class TestFormatRetrievalResults:
@@ -73,7 +66,26 @@ class TestFormatRetrievalResults:
         )
         formatted = format_retrieval_results(results)
         assert isinstance(formatted, str)
-        assert "Similar Clause" in formatted
+        assert "Source [" in formatted
         assert "similarity:" in formatted
         assert "Type:" in formatted
         assert "Risk Level:" in formatted
+
+    def test_format_statute_type(self, loaded_multi_source_db):
+        results = search_similar_clauses(
+            "data protection law", loaded_multi_source_db, top_k=3
+        )
+        statute_results = [r for r in results if r["clause"]["doc_type"] == "statute"]
+        assert len(statute_results) > 0, "Expected at least one statute result"
+        formatted = format_retrieval_results(statute_results)
+        assert "Jurisdiction:" in formatted
+        assert "Jurisdiction: UK" in formatted
+
+    def test_format_playbook_type(self, loaded_multi_source_db):
+        results = search_similar_clauses(
+            "indemnification playbook", loaded_multi_source_db, top_k=3
+        )
+        playbook_results = [r for r in results if r["clause"]["doc_type"] == "playbook"]
+        assert len(playbook_results) > 0, "Expected at least one playbook result"
+        formatted = format_retrieval_results(playbook_results)
+        assert "Playbook:" in formatted

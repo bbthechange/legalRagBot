@@ -12,6 +12,8 @@ import os
 import json
 import numpy as np
 
+from src.retry import retry_with_backoff
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,6 +29,8 @@ class OpenAIProvider:
         self.client = OpenAI()
         logger.info("Initialized OpenAI provider")
 
+    # TODO: narrow to specific exception types (429, 500+)
+    @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def embed(self, texts: list[str]) -> np.ndarray:
         logger.debug("Embedding %d texts via OpenAI", len(texts))
         response = self.client.embeddings.create(
@@ -36,6 +40,7 @@ class OpenAIProvider:
         embeddings = [item.embedding for item in response.data]
         return np.array(embeddings, dtype="float32")
 
+    @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
         logger.debug("Chat request to OpenAI model=%s", model or self.chat_model)
@@ -79,6 +84,7 @@ class AzureOpenAIProvider:
             )
         logger.info("Initialized Azure OpenAI provider (endpoint=%s)", endpoint)
 
+    @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def embed(self, texts: list[str]) -> np.ndarray:
         logger.debug("Embedding %d texts via Azure OpenAI", len(texts))
         response = self.client.embeddings.create(
@@ -88,6 +94,7 @@ class AzureOpenAIProvider:
         embeddings = [item.embedding for item in response.data]
         return np.array(embeddings, dtype="float32")
 
+    @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
         logger.debug("Chat request to Azure OpenAI model=%s", model or self.chat_model)
@@ -118,6 +125,7 @@ class BedrockProvider:
         )
         logger.info("Initialized Bedrock provider (region=%s)", region)
 
+    @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def embed(self, texts: list[str]) -> np.ndarray:
         logger.debug("Embedding %d texts via Bedrock", len(texts))
         embeddings = []
@@ -131,6 +139,7 @@ class BedrockProvider:
             embeddings.append(result["embedding"])
         return np.array(embeddings, dtype="float32")
 
+    @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
         logger.debug("Chat request to Bedrock model=%s", model or self.chat_model)

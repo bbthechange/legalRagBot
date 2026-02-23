@@ -86,6 +86,86 @@ def sample_clauses_subset():
 
 
 @pytest.fixture
+def sample_unified_documents():
+    """Three documents in unified schema: clause, statute, playbook."""
+    return [
+        {
+            "doc_id": "uni-001",
+            "source": "clauses_json",
+            "doc_type": "clause",
+            "title": "Test NDA Clause",
+            "text": "Both parties agree to keep information confidential.",
+            "metadata": {
+                "clause_type": "NDA",
+                "category": "confidentiality",
+                "risk_level": "low",
+                "notes": "Standard test clause.",
+                "practice_area": "intellectual_property",
+            },
+        },
+        {
+            "doc_id": "uni-002",
+            "source": "statutes",
+            "doc_type": "statute",
+            "title": "Data Protection Act Section 5",
+            "text": "Personal data shall be processed lawfully and fairly.",
+            "metadata": {
+                "jurisdiction": "UK",
+                "citation": "DPA 2018 s.5",
+            },
+        },
+        {
+            "doc_id": "uni-003",
+            "source": "common_paper",
+            "doc_type": "playbook",
+            "title": "Indemnification Playbook",
+            "text": "Company position on mutual indemnification clauses.",
+            "metadata": {
+                "position": "Prefer mutual indemnification with caps.",
+            },
+        },
+    ]
+
+
+@pytest.fixture
+def loaded_multi_source_db(mock_provider, sample_unified_documents):
+    """Build a FAISS store with the 3 unified-schema documents."""
+    from src.vector_store import FaissVectorStore
+    from src.embeddings import infer_practice_area
+
+    store = FaissVectorStore()
+    docs = sample_unified_documents
+
+    texts = [f"{d['title']}: {d['text']}" for d in docs]
+    embeddings = mock_provider.embed(texts)
+
+    ids = [d["doc_id"] for d in docs]
+    metadata = []
+    for doc in docs:
+        flat = {
+            "title": doc["title"],
+            "text": doc["text"],
+            "source": doc["source"],
+            "doc_type": doc["doc_type"],
+        }
+        for k, v in doc.get("metadata", {}).items():
+            if v is not None:
+                flat[k] = v
+        if "clause_type" in flat:
+            flat["type"] = flat["clause_type"]
+        metadata.append(flat)
+
+    store.upsert(ids, embeddings, metadata)
+
+    return {
+        "store": store,
+        "documents": docs,
+        "clauses": docs,
+        "provider": mock_provider,
+    }
+
+
+@pytest.fixture
 def faiss_store():
     from src.vector_store import FaissVectorStore
     return FaissVectorStore()
@@ -123,5 +203,6 @@ def loaded_faiss_db(mock_provider, sample_clauses):
     return {
         "store": store,
         "clauses": sample_clauses,
+        "documents": sample_clauses,
         "provider": mock_provider,
     }
