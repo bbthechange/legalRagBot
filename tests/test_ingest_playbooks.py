@@ -38,12 +38,12 @@ def playbook_dir(tmp_path):
 
 
 def test_load_raw_reads_files(playbook_dir):
-    """load_raw() reads all clauses from playbook files."""
+    """load_raw() reads playbook files and returns playbook-level dicts."""
     ingestor = PlaybookIngestor(data_dir=str(playbook_dir))
     raw = ingestor.load_raw()
-    assert len(raw) == 2
-    assert raw[0]["clause_type"] == "limitation_of_liability"
-    assert raw[1]["clause_type"] == "indemnification"
+    assert len(raw) == 1  # One playbook file
+    assert raw[0]["playbook_id"] == "test-playbook"
+    assert len(raw[0]["clauses"]) == 2
 
 
 def test_transform_one_doc_per_clause(playbook_dir):
@@ -64,6 +64,8 @@ def test_transform_correct_source_and_doc_type(playbook_dir):
     for doc in docs:
         assert doc["source"] == "common_paper"
         assert doc["doc_type"] == "playbook"
+        assert doc["metadata"]["practice_area"] == "commercial_contracts"
+        assert doc["metadata"]["risk_level"] is None
 
 
 def test_transform_text_contains_all_positions(playbook_dir):

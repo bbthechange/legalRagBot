@@ -14,31 +14,15 @@ from src.output_parser import parse_json_response_or_raw
 logger = logging.getLogger(__name__)
 
 KNOWN_CLAUSE_TYPES = [
-    "limitation_of_liability",
-    "indemnification",
-    "data_protection",
-    "termination",
-    "ip_ownership",
-    "confidentiality",
-    "confidentiality_scope",
-    "confidentiality_exclusions",
-    "confidentiality_duration",
-    "governing_law",
-    "warranty",
-    "service_levels",
-    "insurance",
-    "non_solicitation",
-    "permitted_disclosures",
-    "return_or_destruction",
-    "remedies",
-    "force_majeure",
-    "assignment",
-    "notices",
-    "entire_agreement",
-    "amendments",
+    "limitation_of_liability", "indemnification", "data_protection",
+    "termination", "ip_ownership", "confidentiality", "governing_law",
+    "warranty", "service_levels", "insurance", "non_compete",
+    "non_solicitation", "assignment", "force_majeure", "notices",
+    "entire_agreement", "amendment", "severability", "waiver",
+    "representations", "payment_terms", "audit_rights",
 ]
 
-# Pattern matches: "1.", "1.1", "1.1.1", "ARTICLE I", or ALL CAPS headings on their own line
+# Pattern matches: "1.", "1.1", "1.1.1", "ARTICLE I", or ALL CAPS headings
 _SECTION_PATTERN = re.compile(
     r"(?:^|\n)"
     r"(?:"
@@ -51,21 +35,33 @@ _SECTION_PATTERN = re.compile(
 MIN_CHUNK_LENGTH = 20
 
 
+CLASSIFY_PROMPT = """You are a legal document analyst. Classify the following contract clause into one of these types:
+
+{clause_types}
+
+If the clause doesn't clearly fit any type, use "other".
+
+Contract clause:
+{clause_text}
+
+Respond with ONLY a JSON object:
+{{"clause_type": "the_type", "confidence": "high|medium|low"}}"""
+
+
 def chunk_contract(text: str) -> list[dict]:
     """
-    Split contract text into clause chunks.
+    Split contract text into clause-level chunks.
 
-    Returns a list of dicts with keys: text, position (0-based index), heading.
+    Returns list of {"text": str, "position": int, "heading": str | None}
     Fragments shorter than MIN_CHUNK_LENGTH are discarded.
     """
     splits = list(_SECTION_PATTERN.finditer(text))
 
     if not splits:
-        # No section markers found — return entire text as one chunk
         stripped = text.strip()
         if len(stripped) < MIN_CHUNK_LENGTH:
             return []
-        return [{"text": stripped, "position": 0, "heading": ""}]
+        return [{"text": stripped, "position": 0, "heading": None}]
 
     chunks = []
     for i, match in enumerate(splits):
@@ -76,13 +72,12 @@ def chunk_contract(text: str) -> list[dict]:
         if len(chunk_text) < MIN_CHUNK_LENGTH:
             continue
 
-        # Extract heading from the match
         heading = match.group().strip().rstrip(".")
 
         chunks.append({
             "text": chunk_text,
             "position": len(chunks),
-            "heading": heading,
+            "heading": heading if heading else None,
         })
 
     return chunks
@@ -90,32 +85,25 @@ def chunk_contract(text: str) -> list[dict]:
 
 def classify_clause_type(clause_text: str, provider) -> dict:
     """
-    Use an LLM to classify a clause chunk into a known clause type.
+    Use an LLM to classify a clause's type.
 
-    Returns a dict with clause_type and confidence keys.
+    Returns {"clause_type": str, "confidence": str}
     """
-    clause_list = ", ".join(KNOWN_CLAUSE_TYPES)
     messages = [
-        {
-            "role": "system",
-            "content": (
-                "You are a legal contract analyst. Classify the following contract clause "
-                "into one of these types: " + clause_list + ", or 'other' if none fit.\n\n"
-                "Respond with JSON only: {\"clause_type\": \"...\", \"confidence\": \"high|medium|low\"}"
-            ),
-        },
-        {"role": "user", "content": clause_text[:2000]},
+        {"role": "system", "content": "You are a legal document classifier. Return only valid JSON."},
+        {"role": "user", "content": CLASSIFY_PROMPT.format(
+            clause_types=", ".join(KNOWN_CLAUSE_TYPES),
+            clause_text=clause_text[:2000],
+        )},
     ]
 
     try:
-        raw = generate_analysis(messages, provider, max_tokens=200)
-        result = parse_json_response_or_raw(raw)
-        if result.get("parse_error"):
-            return {"clause_type": "other", "confidence": "low"}
-        return {
-            "clause_type": result.get("clause_type", "other"),
-            "confidence": result.get("confidence", "low"),
-        }
+        raw = generate_analysis(messages, provider, temperature=0.0, max_tokens=100)
+        parsed = parse_json_response_or_raw(raw)
+
+        if isinstance(parsed, dict) and "clause_type" in parsed:
+            return parsed
+        return {"clause_type": "other", "confidence": "low"}
     except Exception:
         logger.warning("Clause classification failed, defaulting to 'other'")
         return {"clause_type": "other", "confidence": "low"}
@@ -123,19 +111,26 @@ def classify_clause_type(clause_text: str, provider) -> dict:
 
 def extract_clauses(contract_text: str, provider) -> list[dict]:
     """
-    Full extraction pipeline: chunk the contract, then classify each chunk.
+    Full clause extraction pipeline: chunk -> classify.
 
-    Returns a list of dicts with keys: text, position, heading, clause_type, confidence.
+    Returns list of classified clause chunks:
+    [{"text": str, "clause_type": str, "confidence": str, "position": int, "heading": str|None}]
     """
     chunks = chunk_contract(contract_text)
-    results = []
+    logger.info(f"Chunked contract into {len(chunks)} sections")
+
+    classified = []
     for chunk in chunks:
         classification = classify_clause_type(chunk["text"], provider)
-        results.append({
+        classified.append({
             "text": chunk["text"],
+            "clause_type": classification["clause_type"],
+            "confidence": classification.get("confidence", "medium"),
             "position": chunk["position"],
             "heading": chunk["heading"],
-            "clause_type": classification["clause_type"],
-            "confidence": classification["confidence"],
         })
-    return results
+
+    logger.info(f"Classified {len(classified)} clauses: "
+                f"{len([c for c in classified if c['clause_type'] != 'other'])} typed, "
+                f"{len([c for c in classified if c['clause_type'] == 'other'])} other")
+    return classified

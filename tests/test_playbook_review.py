@@ -99,32 +99,48 @@ def test_review_contract_with_mocked_extraction(
     assert result["review_status"] == "pending_review"
     assert "disclaimer" in result
 
+    # Verify clause analyses have the expected top-level keys (flat, not nested)
+    for a in result["clause_analyses"]:
+        assert "playbook_match" in a
+        assert "extracted_text" in a
+        assert "position_in_contract" in a
+
+    # Verify summary uses the spec's flat keys
+    summary = result["summary"]
+    assert "total_clauses_reviewed" in summary
+    assert "preferred_match" in summary
+    assert "fallback_match" in summary
+    assert "walk_away_triggered" in summary
+    assert "not_in_playbook" in summary
+    assert "overall_risk" in summary
+
 
 def test_build_contract_summary_counts():
-    """_build_contract_summary correctly counts alignments."""
+    """_build_contract_summary correctly counts matches."""
     analyses = [
-        {"clause_type": "a", "analysis": {"alignment": "preferred", "risk_level": "low"}},
-        {"clause_type": "b", "analysis": {"alignment": "fallback", "risk_level": "medium"}},
-        {"clause_type": "c", "analysis": {"alignment": "preferred", "risk_level": "low"}},
+        {"playbook_match": "preferred", "risk_level": "low"},
+        {"playbook_match": "fallback", "risk_level": "medium"},
+        {"playbook_match": "preferred", "risk_level": "low"},
     ]
     summary = _build_contract_summary(analyses, {})
-    assert summary["total_clauses"] == 3
-    assert summary["alignment_counts"]["preferred"] == 2
-    assert summary["alignment_counts"]["fallback"] == 1
+    assert summary["total_clauses_reviewed"] == 3
+    assert summary["preferred_match"] == 2
+    assert summary["fallback_match"] == 1
     assert summary["overall_risk"] == "low"
 
 
 def test_build_contract_summary_walk_away_is_high_risk():
     """_build_contract_summary marks overall risk as high when walk_away present."""
     analyses = [
-        {"clause_type": "a", "analysis": {"alignment": "preferred", "risk_level": "low"}},
+        {"playbook_match": "preferred", "risk_level": "low"},
         {
-            "clause_type": "b",
-            "heading": "LIABILITY",
-            "analysis": {"alignment": "walk_away", "risk_level": "high", "analysis": "Bad clause"},
+            "playbook_match": "walk_away",
+            "risk_level": "high",
+            "gaps": [{"issue": "Liability cap below threshold", "severity": "high"}],
         },
     ]
     summary = _build_contract_summary(analyses, {})
     assert summary["overall_risk"] == "high"
+    assert summary["walk_away_triggered"] == 1
     assert len(summary["critical_issues"]) == 1
-    assert summary["critical_issues"][0]["clause_type"] == "b"
+    assert "Liability cap" in summary["critical_issues"][0]

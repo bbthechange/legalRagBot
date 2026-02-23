@@ -45,6 +45,7 @@ class TestChunkContract:
         chunks = chunk_contract(text)
         assert len(chunks) == 1
         assert chunks[0]["position"] == 0
+        assert chunks[0]["heading"] is None
 
     def test_tiny_fragments_skipped(self):
         """Fragments shorter than MIN_CHUNK_LENGTH are discarded."""
@@ -55,7 +56,6 @@ class TestChunkContract:
             "This is a valid section with enough text to pass the minimum length check."
         )
         chunks = chunk_contract(text)
-        # The first chunk "1. SHORT\ntiny" may be short, second should be kept
         for chunk in chunks:
             assert len(chunk["text"]) >= 20
 
@@ -79,7 +79,7 @@ class TestClassifyClauseType:
 
     def test_classify_returns_clause_type(self, mock_provider, monkeypatch):
         """classify_clause_type returns a dict with clause_type and confidence."""
-        def mock_chat(messages, model=None, temperature=0.2, max_tokens=200):
+        def mock_chat(messages, model=None, temperature=0.0, max_tokens=100):
             return json.dumps({"clause_type": "indemnification", "confidence": "high"})
 
         monkeypatch.setattr(mock_provider, "chat", mock_chat)
@@ -93,7 +93,7 @@ class TestExtractClauses:
 
     def test_extract_returns_all_keys(self, mock_provider, monkeypatch):
         """extract_clauses returns dicts with text, position, heading, clause_type, confidence."""
-        def mock_chat(messages, model=None, temperature=0.2, max_tokens=200):
+        def mock_chat(messages, model=None, temperature=0.0, max_tokens=100):
             return json.dumps({"clause_type": "termination", "confidence": "medium"})
 
         monkeypatch.setattr(mock_provider, "chat", mock_chat)

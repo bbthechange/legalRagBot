@@ -167,7 +167,6 @@ def main():
         print_comparison_results(comparison)
 
     elif args.review:
-        import json as _json
         from glob import glob
         from src.playbook_review import review_contract
 
@@ -212,34 +211,31 @@ def main():
 
         # Display results
         print(f"\n{'=' * 60}")
-        print(f"  CONTRACT REVIEW — {result['playbook']}")
-        print(f"  Clauses analyzed: {result['total_clauses']}")
+        print(f"  DRAFT CONTRACT REVIEW \u2014 Requires Attorney Review")
+        print(f"  Playbook: {result['playbook']}")
         print(f"{'=' * 60}")
 
         summary = result["summary"]
         print(f"\n--- Summary ---")
+        print(f"  Clauses reviewed: {summary['total_clauses_reviewed']}")
+        print(f"  Preferred match: {summary['preferred_match']}")
+        print(f"  Fallback match: {summary['fallback_match']}")
+        print(f"  Walk-away triggered: {summary['walk_away_triggered']}")
+        print(f"  Not in playbook: {summary['not_in_playbook']}")
         print(f"  Overall risk: {summary['overall_risk'].upper()}")
-        print(f"  Alignment: {summary['alignment_counts']}")
-        print(f"  Risk levels: {summary['risk_levels']}")
 
         if summary.get("critical_issues"):
-            print(f"\n--- Critical Issues ---")
+            print(f"\n  CRITICAL ISSUES:")
             for issue in summary["critical_issues"]:
-                print(f"  [{issue['clause_type']}] {issue.get('reason', 'Walk-away triggered')}")
+                print(f"    ! {issue}")
 
-        print(f"\n--- Clause-by-Clause Analysis ---")
-        for item in result["clause_analyses"]:
-            print(f"\n  [{item['position']}] {item['clause_type']} "
-                  f"(heading: {item.get('heading', 'N/A')})")
-            analysis = item["analysis"]
-            if isinstance(analysis, dict) and not analysis.get("parse_error"):
-                print(f"      Alignment: {analysis.get('alignment', 'N/A')}")
-                print(f"      Risk: {analysis.get('risk_level', 'N/A')}")
-                print(f"      Analysis: {analysis.get('analysis', 'N/A')}")
-                if analysis.get("redline_suggestions"):
-                    print(f"      Redlines: {analysis['redline_suggestions']}")
-            else:
-                print(f"      {_json.dumps(analysis, indent=6)}")
+        for a in result["clause_analyses"]:
+            if isinstance(a, dict):
+                print(f"\n--- {a.get('clause_type', 'unknown').replace('_', ' ').title()} ---")
+                print(f"  Match: {a.get('playbook_match', 'N/A')}")
+                print(f"  Risk: {a.get('risk_level', 'N/A')}")
+                if a.get("suggested_redline"):
+                    print(f"  Redline: {a['suggested_redline'][:200]}")
 
         print(f"\n{'=' * 60}")
         print(f"  Review Status: {result['review_status'].upper()}")
