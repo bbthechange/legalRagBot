@@ -9,7 +9,8 @@ def test_register_ingestors_no_args_returns_all():
     ingestors = register_ingestors()
     assert "clauses_json" in ingestors
     assert "cuad" in ingestors
-    assert len(ingestors) == 2
+    assert "common_paper" in ingestors
+    assert len(ingestors) == 3
 
 
 def test_register_ingestors_clauses_json_only():
@@ -54,3 +55,10 @@ def test_register_ingestors_multiple_known_sources():
     assert "clauses_json" in ingestors
     assert "cuad" in ingestors
     assert len(ingestors) == 2
+
+
+def test_register_ingestors_common_paper_only():
+    """register_ingestors(sources=['common_paper']) returns only playbook ingestor."""
+    ingestors = register_ingestors(sources=["common_paper"])
+    assert "common_paper" in ingestors
+    assert len(ingestors) == 1

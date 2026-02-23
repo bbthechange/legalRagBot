@@ -101,3 +101,30 @@ class ErrorResponse(BaseModel):
     """Error response body."""
     error: str
     detail: str = ""
+
+
+# --- Contract Review ---
+
+class ContractReviewRequest(BaseModel):
+    """Request body for playbook-driven contract review."""
+    contract_text: str = Field(
+        ...,
+        min_length=50,
+        max_length=500_000,
+        description="The full contract text to review",
+    )
+    playbook: str = Field(
+        default="saas-vendor-review",
+        pattern=r"^[a-z0-9][a-z0-9_-]*$",
+        description="Playbook ID to review against (e.g., 'saas-vendor-review', 'nda-review')",
+    )
+
+
+class ContractReviewResponse(BaseModel):
+    """Response from contract review."""
+    playbook: str
+    total_clauses: int
+    summary: dict
+    clause_analyses: list[dict]
+    review_status: str = "pending_review"
+    disclaimer: str

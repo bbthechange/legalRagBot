@@ -32,10 +32,12 @@ def register_ingestors(sources: list[str] | None = None, max_cuad: int | None = 
     """Build the ingestor registry based on requested sources."""
     from src.ingest.clauses_json import ClausesJsonIngestor
     from src.ingest.cuad import CuadIngestor
+    from src.ingest.playbooks import PlaybookIngestor
 
     available = {
         "clauses_json": lambda: ClausesJsonIngestor(),
         "cuad": lambda: CuadIngestor(max_docs=max_cuad),
+        "common_paper": lambda: PlaybookIngestor(),
     }
 
     if sources:

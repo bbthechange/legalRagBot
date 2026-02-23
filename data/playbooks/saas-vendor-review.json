@@ -1,0 +1,87 @@
+{
+  "playbook_id": "saas-vendor-review",
+  "name": "SaaS Vendor Contract Review",
+  "description": "Playbook for reviewing inbound SaaS vendor agreements. Positions derived from Common Paper Cloud Service Agreement (CC BY 4.0).",
+  "clauses": [
+    {
+      "clause_type": "limitation_of_liability",
+      "preferred_position": "Mutual liability cap equal to 12 months of fees paid or payable. Uncapped liability for breach of confidentiality, IP infringement, and willful misconduct. No exclusion of consequential damages for data breach or confidentiality breach.",
+      "fallback_position": "Mutual liability cap equal to fees paid in prior 12 months. Carve-outs from cap limited to IP infringement and willful misconduct only. Consequential damages excluded except for confidentiality breach.",
+      "walk_away": "Vendor cap less than 3 months of fees. No carve-outs from cap for any obligation. Complete exclusion of all consequential and indirect damages with no exceptions.",
+      "risk_factors": ["Asymmetric cap favoring vendor", "No carve-outs for data breach", "Cap tied to individual SOW rather than aggregate fees"],
+      "notes": "Always verify whether the cap applies per-claim or in aggregate. Per-claim caps can effectively eliminate meaningful recovery."
+    },
+    {
+      "clause_type": "indemnification",
+      "preferred_position": "Vendor indemnifies customer for IP infringement claims, breach of confidentiality, and violation of applicable laws. Mutual indemnification for third-party bodily injury and property damage. Customer controls defense of claims against it with vendor cooperation.",
+      "fallback_position": "Vendor indemnifies for IP infringement claims only. Standard indemnification procedures with prompt notice requirement and vendor-controlled defense. Customer indemnifies vendor for claims arising from customer data.",
+      "walk_away": "No vendor indemnification obligation. Customer required to indemnify vendor for all third-party claims. Indemnification conditioned on unreasonably short notice periods.",
+      "risk_factors": ["Sole remedy clauses that limit indemnification to credits", "Broad exclusions that gut indemnification coverage", "No obligation for vendor to modify infringing service"],
+      "notes": "Ensure indemnification survives termination. Check whether indemnification is subject to the overall liability cap."
+    },
+    {
+      "clause_type": "data_protection",
+      "preferred_position": "Vendor processes customer data only per documented instructions. Data processed in specified jurisdictions only. Vendor maintains SOC 2 Type II certification. Customer retains all rights to its data. Vendor must notify customer of data breaches within 48 hours. Data returned or destroyed upon termination.",
+      "fallback_position": "Vendor processes data per agreement terms. Data may be processed in vendor-approved jurisdictions with adequate protections. Vendor maintains reasonable security measures. Breach notification within 72 hours. Data export available for 30 days post-termination.",
+      "walk_away": "Vendor claims ownership or unrestricted license to customer data. No data breach notification obligation. No commitment to data return or deletion. No security certifications or audit rights.",
+      "risk_factors": ["Broad license grants over customer data", "Vendor right to use aggregated or anonymized data without limits", "No sub-processor restrictions"],
+      "notes": "If customer data includes personal data, ensure a DPA is in place that complies with applicable privacy laws (GDPR, CCPA, etc.)."
+    },
+    {
+      "clause_type": "termination",
+      "preferred_position": "Either party may terminate for material breach with 30-day cure period. Customer may terminate for convenience on 30 days notice with pro-rata refund. Automatic termination upon insolvency. Transition assistance period of 90 days post-termination.",
+      "fallback_position": "Termination for material breach with 30-day cure. No termination for convenience during initial term. Pro-rata refund for termination due to vendor breach only. 30-day transition period.",
+      "walk_away": "No termination for cause right. Auto-renewal with no opt-out window. No refund upon termination regardless of cause. No transition assistance.",
+      "risk_factors": ["Long cure periods (60+ days) that delay exit", "Termination fees exceeding remaining contract value", "No data portability upon termination"],
+      "notes": "Verify that termination provisions align with the data protection clause regarding data return and destruction timelines."
+    },
+    {
+      "clause_type": "ip_ownership",
+      "preferred_position": "Customer retains all IP in customer data and customer configurations. Vendor retains all IP in the service. Any customizations developed for customer are owned by customer. No license grant to vendor over customer IP beyond what is necessary to perform the service.",
+      "fallback_position": "Customer retains IP in customer data. Vendor retains IP in service and customizations but grants customer a perpetual license to customizations. Limited license to vendor over customer data solely for service delivery.",
+      "walk_away": "Vendor acquires ownership of customer data, configurations, or customizations. Vendor obtains broad IP license that survives termination. No restrictions on vendor use of customer-provided materials.",
+      "risk_factors": ["Broad assignment clauses buried in standard terms", "License grants that expand through aggregation or anonymization", "Work product ownership clauses favoring vendor"],
+      "notes": "Pay special attention to clauses about training ML models on customer data. This is an emerging risk area."
+    },
+    {
+      "clause_type": "confidentiality",
+      "preferred_position": "Mutual confidentiality with standard exceptions (public knowledge, independent development, prior possession, legally required disclosure). 5-year duration post-termination. Trade secrets protected indefinitely. Return or destroy confidential information upon request.",
+      "fallback_position": "Mutual confidentiality with standard exceptions. 3-year duration post-termination. Permitted disclosure to affiliates and professional advisors under NDA. Residual knowledge clause limited to general ideas only.",
+      "walk_away": "No confidentiality obligation on vendor. Confidentiality term less than 2 years. Broad residual knowledge clause allowing vendor to use specific confidential information. No return or destruction obligation.",
+      "risk_factors": ["Asymmetric obligations favoring vendor", "Overly broad residual knowledge clauses", "No obligation to notify of legally compelled disclosures"],
+      "notes": "Ensure the definition of confidential information covers pricing, usage data, and the terms of the agreement itself."
+    },
+    {
+      "clause_type": "governing_law",
+      "preferred_position": "Governed by the laws of customer's home state. Disputes resolved in state or federal courts in customer's jurisdiction. Waiver of jury trial. Prevailing party entitled to reasonable attorneys' fees.",
+      "fallback_position": "Governed by laws of a mutually agreed neutral state (Delaware or New York). Disputes resolved by binding arbitration under AAA Commercial Rules. Each party bears own costs.",
+      "walk_away": "Governed by laws of a foreign jurisdiction. Mandatory arbitration in vendor's home jurisdiction with vendor-selected arbitrator. Customer waives right to participate in class actions.",
+      "risk_factors": ["Mandatory arbitration with high filing fees", "Forum selection clause in distant or inconvenient jurisdiction", "Choice of law that invalidates key contract protections"],
+      "notes": "If the vendor is international, consider whether the chosen jurisdiction has treaties that facilitate enforcement of judgments."
+    },
+    {
+      "clause_type": "warranty",
+      "preferred_position": "Vendor warrants the service will perform materially in accordance with documentation. Vendor warrants compliance with all applicable laws. Vendor warrants it has authority to enter the agreement and no conflicts exist. Warranty period matches subscription term.",
+      "fallback_position": "Vendor warrants material conformance with documentation for 90 days following delivery. AS-IS disclaimer for third-party integrations. Sole remedy for warranty breach is repair or replacement.",
+      "walk_away": "Complete AS-IS disclaimer with no performance warranty. No warranty of compliance with laws. No warranty of non-infringement. Vendor disclaims all implied warranties including merchantability and fitness.",
+      "risk_factors": ["Short warranty periods that expire before issues surface", "Sole remedy limited to credits rather than repair", "Disclaimer of non-infringement warranty"],
+      "notes": "A complete warranty disclaimer is a significant red flag for enterprise SaaS. At minimum, seek a warranty that the service will perform per the documentation."
+    },
+    {
+      "clause_type": "service_levels",
+      "preferred_position": "99.9% uptime SLA with monthly measurement. Service credits of 10% of monthly fees per 0.1% below target. Escalating credits up to 30% for sustained outages. Right to terminate if uptime falls below 99.0% for 3 consecutive months. Exclusions limited to scheduled maintenance and force majeure.",
+      "fallback_position": "99.5% uptime SLA measured quarterly. Service credits of 5% per 0.5% below target, capped at 15% of quarterly fees. No termination right for SLA failure. Reasonable maintenance windows excluded.",
+      "walk_away": "No uptime commitment or SLA. Credits are sole and exclusive remedy for all service failures. Broad exclusions that effectively eliminate SLA coverage. SLA measured annually (hides chronic issues).",
+      "risk_factors": ["Uptime measured excluding planned downtime windows", "Credits that expire if not claimed within short periods", "SLA that excludes API availability or key features"],
+      "notes": "Verify SLA covers all critical service components, not just the primary web application. API, data processing, and integrations should be covered."
+    },
+    {
+      "clause_type": "insurance",
+      "preferred_position": "Vendor maintains commercial general liability ($2M), professional liability/E&O ($5M), cyber liability ($5M), and workers compensation (statutory limits). Customer named as additional insured on CGL policy. Certificates of insurance provided annually.",
+      "fallback_position": "Vendor maintains commercial general liability ($1M), professional liability ($2M), and cyber liability ($2M). Evidence of insurance upon request. No additional insured status.",
+      "walk_away": "No insurance requirements. Vendor unwilling to confirm insurance coverage. No cyber liability insurance despite handling sensitive data. Coverage amounts below $1M for any required policy.",
+      "risk_factors": ["Self-insured retention amounts that effectively eliminate coverage", "Policies with exclusions for technology services", "No requirement to maintain coverage during agreement term"],
+      "notes": "Insurance requirements should be proportional to the risk profile of the engagement. Higher data sensitivity warrants higher cyber liability limits."
+    }
+  ]
+}

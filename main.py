@@ -149,6 +149,8 @@ def main():
                         help="Run the evaluation suite")
     parser.add_argument("--compare", action="store_true",
                         help="Compare all prompt strategies")
+    parser.add_argument("--review", action="store_true",
+                        help="Interactive playbook-driven contract review")
     args = parser.parse_args()
 
     print("Initializing knowledge base...")
@@ -163,6 +165,86 @@ def main():
         print("\nComparing prompt strategies (this will take a minute)...")
         comparison = compare_strategies(db)
         print_comparison_results(comparison)
+
+    elif args.review:
+        import json as _json
+        from glob import glob
+        from src.playbook_review import review_contract
+
+        playbook_files = sorted(glob("data/playbooks/*.json"))
+        if not playbook_files:
+            print("No playbooks found in data/playbooks/")
+            sys.exit(1)
+
+        print("\nAvailable playbooks:")
+        for i, path in enumerate(playbook_files, 1):
+            name = os.path.splitext(os.path.basename(path))[0]
+            print(f"  [{i}] {name}")
+
+        choice = input("\nSelect playbook number: ").strip()
+        try:
+            playbook_path = playbook_files[int(choice) - 1]
+        except (ValueError, IndexError):
+            print("Invalid selection.")
+            sys.exit(1)
+
+        print("\nPaste your contract text (enter two blank lines when done):")
+        lines = []
+        blank_count = 0
+        while True:
+            line = input()
+            if line == "":
+                blank_count += 1
+                if blank_count >= 2:
+                    break
+                lines.append(line)
+            else:
+                blank_count = 0
+                lines.append(line)
+        contract_text = "\n".join(lines).strip()
+
+        if len(contract_text) < 50:
+            print("Contract text too short (minimum 50 characters).")
+            sys.exit(1)
+
+        print("\nReviewing contract against playbook...")
+        result = review_contract(contract_text, playbook_path, db)
+
+        # Display results
+        print(f"\n{'=' * 60}")
+        print(f"  CONTRACT REVIEW — {result['playbook']}")
+        print(f"  Clauses analyzed: {result['total_clauses']}")
+        print(f"{'=' * 60}")
+
+        summary = result["summary"]
+        print(f"\n--- Summary ---")
+        print(f"  Overall risk: {summary['overall_risk'].upper()}")
+        print(f"  Alignment: {summary['alignment_counts']}")
+        print(f"  Risk levels: {summary['risk_levels']}")
+
+        if summary.get("critical_issues"):
+            print(f"\n--- Critical Issues ---")
+            for issue in summary["critical_issues"]:
+                print(f"  [{issue['clause_type']}] {issue.get('reason', 'Walk-away triggered')}")
+
+        print(f"\n--- Clause-by-Clause Analysis ---")
+        for item in result["clause_analyses"]:
+            print(f"\n  [{item['position']}] {item['clause_type']} "
+                  f"(heading: {item.get('heading', 'N/A')})")
+            analysis = item["analysis"]
+            if isinstance(analysis, dict) and not analysis.get("parse_error"):
+                print(f"      Alignment: {analysis.get('alignment', 'N/A')}")
+                print(f"      Risk: {analysis.get('risk_level', 'N/A')}")
+                print(f"      Analysis: {analysis.get('analysis', 'N/A')}")
+                if analysis.get("redline_suggestions"):
+                    print(f"      Redlines: {analysis['redline_suggestions']}")
+            else:
+                print(f"      {_json.dumps(analysis, indent=6)}")
+
+        print(f"\n{'=' * 60}")
+        print(f"  Review Status: {result['review_status'].upper()}")
+        print(f"  {result['disclaimer']}")
+        print(f"{'=' * 60}")
 
     else:
         interactive_mode(db)

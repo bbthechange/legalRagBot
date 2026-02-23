@@ -9,6 +9,7 @@ Usage:
     python -m src.api
 """
 
+import json
 import logging
 import os
 import time
@@ -21,6 +22,7 @@ from src.api_models import (
     AnalyzeRequest, AnalyzeResponse,
     SearchRequest, SearchResponse, SearchResult,
     HealthResponse, ErrorResponse, SourceInfo,
+    ContractReviewRequest, ContractReviewResponse,
 )
 from src.embeddings import load_clause_database
 from src.rag_pipeline import analyze_clause, STRATEGIES
@@ -180,6 +182,47 @@ def search(req: SearchRequest, db: dict = Depends(get_db)):
         results=search_results,
         query=req.query,
         total_results=len(search_results),
+    )
+
+
+@app.post(
+    "/contract-review",
+    response_model=ContractReviewResponse,
+    dependencies=[Depends(verify_api_key)],
+)
+def contract_review(req: ContractReviewRequest, db: dict = Depends(get_db)):
+    """
+    Review a contract against a firm playbook.
+
+    Extracts clauses, compares each against the playbook positions,
+    and generates a clause-by-clause report with risk assessments.
+    Output is always a draft requiring attorney review.
+    """
+    from src.playbook_review import review_contract
+
+    playbook_path = os.path.realpath(f"data/playbooks/{req.playbook}.json")
+    allowed_dir = os.path.realpath("data/playbooks")
+    if not playbook_path.startswith(allowed_dir + os.sep):
+        raise HTTPException(status_code=400, detail="Invalid playbook name.")
+    if not os.path.exists(playbook_path):
+        raise HTTPException(
+            status_code=404,
+            detail=f"Playbook '{req.playbook}' not found.",
+        )
+
+    logger.info(f"Contract review request: playbook={req.playbook}")
+    try:
+        result = review_contract(req.contract_text, playbook_path, db)
+    except (json.JSONDecodeError, KeyError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail=f"Playbook file is invalid: {exc}")
+
+    return ContractReviewResponse(
+        playbook=result["playbook"],
+        total_clauses=result["total_clauses"],
+        summary=result["summary"],
+        clause_analyses=result["clause_analyses"],
+        review_status=result["review_status"],
+        disclaimer=result["disclaimer"],
     )
 
 

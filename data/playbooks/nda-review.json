@@ -1,0 +1,71 @@
+{
+  "playbook_id": "nda-review",
+  "name": "NDA Review",
+  "description": "Playbook for reviewing non-disclosure agreements. Positions derived from Common Paper Standard NDA (CC BY 4.0).",
+  "clauses": [
+    {
+      "clause_type": "confidentiality_scope",
+      "preferred_position": "Confidential information limited to information expressly marked as confidential or that a reasonable person would understand to be confidential given the circumstances. Oral disclosures must be confirmed in writing within 30 days. Excludes publicly available information, independently developed information, and information received from third parties without restriction.",
+      "fallback_position": "All information exchanged in connection with the purpose is confidential regardless of marking. Oral disclosures included without written confirmation requirement. Standard exclusions apply.",
+      "walk_away": "All information of any kind is deemed confidential with no exceptions. No marking or identification requirement and no standard exclusions for public information or independent development.",
+      "risk_factors": ["Overly broad scope that captures trivial communications", "No marking requirement making compliance difficult", "Absence of standard exclusions"],
+      "notes": "The scope definition drives the entire NDA. Too broad and it becomes unmanageable; too narrow and it fails to protect key information."
+    },
+    {
+      "clause_type": "confidentiality_exclusions",
+      "preferred_position": "Standard exclusions: publicly available information, information known prior to disclosure, information independently developed, information received from third parties without restriction, and information required to be disclosed by law or regulation with prior notice to disclosing party.",
+      "fallback_position": "Standard exclusions with burden of proof on receiving party. Legally compelled disclosure permitted without prior notice if notice is prohibited by law. Independent development must be documented.",
+      "walk_away": "No exclusions for publicly available information. No exclusion for independently developed information. No exception for legally compelled disclosures.",
+      "risk_factors": ["Missing independent development exclusion", "No legally compelled disclosure exception", "Exclusions require unreasonable burden of proof"],
+      "notes": "All five standard exclusions should be present. Missing exclusions create significant compliance risk."
+    },
+    {
+      "clause_type": "confidentiality_duration",
+      "preferred_position": "Confidentiality obligations survive for 3 years following disclosure. Trade secrets protected for as long as they remain trade secrets under applicable law. No obligation regarding information disclosed more than 5 years ago.",
+      "fallback_position": "Confidentiality obligations survive for 5 years following disclosure. No separate trade secret carve-out. Obligations begin at time of each disclosure, not agreement date.",
+      "walk_away": "Perpetual confidentiality obligation with no expiration. Obligations survive indefinitely after termination with no sunset provision.",
+      "risk_factors": ["Duration tied to agreement term rather than disclosure date", "Perpetual obligations for non-trade-secret information", "No clear start date for measuring the confidentiality period"],
+      "notes": "Duration should be proportional to the sensitivity of the information. 2-5 years is standard for commercial information; trade secrets may warrant longer protection."
+    },
+    {
+      "clause_type": "permitted_disclosures",
+      "preferred_position": "Disclosure permitted to employees, contractors, and professional advisors who have a need to know and are bound by confidentiality obligations at least as protective as this agreement. Disclosing party may approve additional recipients in writing.",
+      "fallback_position": "Disclosure to employees and contractors with need to know who are bound by written confidentiality obligations. No disclosure to advisors without prior written consent. Receiving party responsible for breaches by its recipients.",
+      "walk_away": "No disclosure to anyone without prior written consent for each disclosure. No carve-out for professional advisors or legal counsel. Receiving party strictly liable for any unauthorized disclosure by any person.",
+      "risk_factors": ["No ability to share with legal counsel without consent", "Strict liability for recipient breaches regardless of precautions taken", "No practical ability to use the information for the stated purpose"],
+      "notes": "Ensure the permitted disclosure scope is broad enough to actually use the information for the intended purpose."
+    },
+    {
+      "clause_type": "return_or_destruction",
+      "preferred_position": "Upon request or termination, receiving party returns or destroys confidential information at disclosing party's election within 30 days. Receiving party may retain one archival copy for legal compliance purposes. Certification of destruction provided upon request.",
+      "fallback_position": "Return or destroy within 60 days of written request. Retention permitted for copies in routine backup systems until overwritten in the ordinary course. Written certification upon request.",
+      "walk_away": "No return or destruction obligation. Receiving party may retain all copies indefinitely. No certification mechanism.",
+      "risk_factors": ["No practical destruction mechanism for cloud-stored data", "Overly short return periods (less than 15 days)", "No exception for legally required retention"],
+      "notes": "Consider whether automatic backup systems make literal compliance impossible. A reasonable backup exception is standard practice."
+    },
+    {
+      "clause_type": "remedies",
+      "preferred_position": "Acknowledgment that breach may cause irreparable harm entitling the disclosing party to seek injunctive relief without bond. Injunctive relief is in addition to all other remedies at law or equity. No limitation on damages for breach of confidentiality.",
+      "fallback_position": "Acknowledgment of irreparable harm and right to seek equitable relief. Damages for breach subject to overall agreement liability cap (if applicable). Prevailing party entitled to reasonable attorneys' fees.",
+      "walk_away": "Remedies limited to actual direct damages only. Liquidated damages clause that caps recovery at a nominal amount. Mandatory arbitration with no right to seek interim injunctive relief from courts.",
+      "risk_factors": ["Liability cap that applies to confidentiality breaches", "No acknowledgment of irreparable harm", "Exclusive remedy provisions that limit available relief"],
+      "notes": "Injunctive relief language is important because confidentiality breaches often cannot be remedied by monetary damages alone."
+    },
+    {
+      "clause_type": "non_solicitation",
+      "preferred_position": "No non-solicitation clause. If required by counterparty, limited to direct solicitation of employees involved in the engagement for 12 months. General advertising and job postings not considered solicitation.",
+      "fallback_position": "Mutual non-solicitation of employees for 12 months. Covers direct solicitation only, not indirect contact through recruiters or general advertising. Hiring permitted if the individual approaches independently.",
+      "walk_away": "Non-solicitation exceeding 24 months. Covers all employees, not just those involved in the engagement. Includes non-hire provisions that bar hiring even for unsolicited applicants.",
+      "risk_factors": ["Non-hire provisions that go beyond non-solicitation", "Overly broad definition of solicitation", "Duration exceeding 18 months", "Coverage of all personnel rather than those with access to confidential information"],
+      "notes": "Non-solicitation in an NDA is unusual and should be scrutinized. It is more appropriate for employment or M&A contexts."
+    },
+    {
+      "clause_type": "governing_law",
+      "preferred_position": "Governed by laws of the receiving party's home state. Disputes resolved in courts of mutual jurisdiction. Each party consents to personal jurisdiction. Prevailing party recovers reasonable attorneys' fees.",
+      "fallback_position": "Governed by laws of a neutral state (Delaware or New York). Disputes resolved by binding arbitration under AAA rules. Each party bears own legal costs.",
+      "walk_away": "Governed by laws of a foreign jurisdiction. Mandatory arbitration in disclosing party's home jurisdiction. Disclosing party selects the arbitrator unilaterally.",
+      "risk_factors": ["Foreign governing law that changes confidentiality standards", "Inconvenient forum that discourages enforcement", "Unilateral arbitrator selection"],
+      "notes": "For domestic NDAs, Delaware or New York law is generally acceptable. For international NDAs, governing law has significant implications for trade secret protection."
+    }
+  ]
+}
