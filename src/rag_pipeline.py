@@ -50,7 +50,7 @@ def analyze_clause(
     Returns the parsed analysis alongside a source trail, draft framing,
     and pipeline metadata for explainability and audit trail purposes.
     """
-    logger.info("Analyzing clause with strategy=%s, top_k=%d", strategy, top_k)
+    logger.info("Pipeline: strategy=%s, top_k=%d, model=%s", strategy, top_k, model)
     retrieved = search_similar_clauses(clause_text, db, top_k=top_k)
     context = format_retrieval_results(retrieved)
 
@@ -75,7 +75,7 @@ def analyze_clause(
             "risk_level": clause.get("risk_level", ""),
         })
 
-    logger.info("Analysis complete (strategy=%s, model=%s)", strategy, model or db["provider"].chat_model)
+    logger.info("Pipeline complete: %d clauses retrieved", len(retrieved))
     return {
         "analysis": parsed,
         "sources": sources,

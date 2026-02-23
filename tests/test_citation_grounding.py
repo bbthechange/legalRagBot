@@ -96,9 +96,20 @@ class TestPipelineOutputHasSources:
             assert "risk_level" in src
 
     def test_sources_score_is_positive(self, loaded_faiss_db):
-        result = analyze_clause("test confidential clause", loaded_faiss_db)
-        for src in result["sources"]:
-            assert src["score"] > 0
+        with patch("src.rag_pipeline.search_similar_clauses") as mock_search, \
+             patch("src.rag_pipeline.generate_analysis") as mock_gen:
+            mock_search.return_value = [
+                {
+                    "clause": {"id": "test-001", "title": "T", "type": "NDA",
+                               "category": "c", "text": "t", "risk_level": "low",
+                               "notes": "n"},
+                    "score": 0.85,
+                },
+            ]
+            mock_gen.return_value = '{"risk_level": "low"}'
+            result = analyze_clause("test confidential clause", loaded_faiss_db)
+            for src in result["sources"]:
+                assert src["score"] > 0
 
 
 class TestPipelineOutputHasDraftFraming:

@@ -7,22 +7,23 @@ import numpy as np
 import pytest
 
 
+EMBEDDING_DIM = 1536  # Matches text-embedding-3-small
+
+
 class MockProvider:
     """Deterministic mock LLM provider for testing."""
 
     provider_name = "MockProvider"
-    embedding_model = "mock-embed-v1"
-    chat_model = "mock-chat-v1"
+    embedding_model = "mock-embedding"
+    chat_model = "mock-chat"
 
     def embed(self, texts: list[str]) -> np.ndarray:
-        """Return deterministic embeddings seeded by text hash."""
-        dim = 128
+        """Return deterministic embeddings based on text hash."""
         embeddings = []
         for text in texts:
-            seed = hash(text) % (2**32)
-            rng = np.random.RandomState(seed)
-            vec = rng.randn(dim).astype(np.float32)
-            vec = vec / np.linalg.norm(vec)
+            rng = np.random.RandomState(hash(text) % 2**31)
+            vec = rng.randn(EMBEDDING_DIM).astype(np.float32)
+            vec /= np.linalg.norm(vec)  # L2 normalize
             embeddings.append(vec)
         return np.array(embeddings, dtype=np.float32)
 
@@ -177,37 +178,41 @@ def faiss_store():
 
 
 @pytest.fixture
-def loaded_faiss_db(mock_provider, sample_clauses):
-    """Build a complete FAISS-backed database using mock embeddings."""
-    from src.vector_store import FaissVectorStore
+def loaded_faiss_db(mock_provider, sample_clauses_subset, faiss_store):
+    """
+    A fully loaded database dict matching the shape returned by
+    load_clause_database(), but using mock data and no API calls.
+    """
+    import faiss
     from src.embeddings import infer_practice_area
 
-    store = FaissVectorStore()
-
-    texts = [f"{c['title']}: {c['text']}" for c in sample_clauses]
+    texts = [f"{c['title']}: {c['text']}" for c in sample_clauses_subset]
     embeddings = mock_provider.embed(texts)
 
-    ids = [c["id"] for c in sample_clauses]
-    metadata = []
-    for clause in sample_clauses:
-        metadata.append({
-            "title": clause["title"],
-            "type": clause["type"],
-            "category": clause["category"],
-            "risk_level": clause["risk_level"],
+    faiss.normalize_L2(embeddings)
+
+    ids = [c["id"] for c in sample_clauses_subset]
+    metadata = [
+        {
+            "title": c["title"],
+            "type": c["type"],
+            "category": c["category"],
+            "risk_level": c["risk_level"],
             "source": "clauses_json",
             "doc_type": "clause",
-            "clause_type": clause["type"],
-            "text": clause["text"],
-            "notes": clause["notes"],
-            "practice_area": infer_practice_area(clause["type"]),
-        })
+            "clause_type": c["type"],
+            "text": c["text"],
+            "notes": c["notes"],
+            "practice_area": infer_practice_area(c["type"]),
+        }
+        for c in sample_clauses_subset
+    ]
 
-    store.upsert(ids, embeddings, metadata)
+    faiss_store.upsert(ids, embeddings, metadata)
 
     return {
-        "store": store,
-        "clauses": sample_clauses,
-        "documents": sample_clauses,
+        "store": faiss_store,
+        "clauses": sample_clauses_subset,
+        "documents": sample_clauses_subset,
         "provider": mock_provider,
     }

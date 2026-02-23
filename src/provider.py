@@ -43,7 +43,7 @@ class OpenAIProvider:
     @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
-        logger.debug("Chat request to OpenAI model=%s", model or self.chat_model)
+        logger.debug("Chat request: model=%s, temp=%s", model or self.chat_model, temperature)
         response = self.client.chat.completions.create(
             model=model or self.chat_model,
             messages=messages,
@@ -97,7 +97,7 @@ class AzureOpenAIProvider:
     @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
-        logger.debug("Chat request to Azure OpenAI model=%s", model or self.chat_model)
+        logger.debug("Chat request: model=%s, temp=%s", model or self.chat_model, temperature)
         response = self.client.chat.completions.create(
             model=model or self.chat_model,
             messages=messages,
@@ -142,7 +142,7 @@ class BedrockProvider:
     @retry_with_backoff(max_retries=3, base_delay=1.0, retryable_exceptions=(Exception,))
     def chat(self, messages: list[dict], model: str | None = None,
              temperature: float = 0.2, max_tokens: int = 1500) -> str:
-        logger.debug("Chat request to Bedrock model=%s", model or self.chat_model)
+        logger.debug("Chat request: model=%s, temp=%s", model or self.chat_model, temperature)
         system_parts = []
         converse_messages = []
 

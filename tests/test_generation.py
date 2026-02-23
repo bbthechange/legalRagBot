@@ -27,6 +27,8 @@ class TestBuildStructuredPrompt:
         assert messages[0]["role"] == "system"
         assert messages[1]["role"] == "user"
         assert "JSON" in messages[0]["content"]
+        assert "test clause" in messages[1]["content"]
+        assert "test context" in messages[1]["content"]
 
 
 class TestBuildFewShotPrompt:
@@ -37,6 +39,8 @@ class TestBuildFewShotPrompt:
         assert messages[1]["role"] == "user"
         assert messages[2]["role"] == "assistant"
         assert messages[3]["role"] == "user"
+        assert "test clause" in messages[3]["content"]
+        assert "test context" in messages[3]["content"]
 
 
 class TestGenerateAnalysis:

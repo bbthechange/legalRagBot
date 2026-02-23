@@ -9,7 +9,7 @@ import pytest
 from src.vector_store import FaissVectorStore, create_vector_store
 
 
-def _make_vectors(n, dim=128):
+def _make_vectors(n, dim=1536):
     """Create n random normalized vectors."""
     rng = np.random.RandomState(42)
     vecs = rng.randn(n, dim).astype(np.float32)
@@ -45,6 +45,9 @@ class TestFaissVectorStore:
 
         scores = [r["score"] for r in results]
         assert scores == sorted(scores, reverse=True)
+        # L2-normalized vectors produce scores <= 1.0 (allow float precision)
+        for s in scores:
+            assert s <= 1.0 + 1e-5
 
     def test_search_top_k_1(self):
         store = FaissVectorStore()
@@ -59,7 +62,7 @@ class TestFaissVectorStore:
 
     def test_empty_store_search(self):
         store = FaissVectorStore()
-        results = store.search(np.zeros((1, 128), dtype=np.float32))
+        results = store.search(np.zeros((1, 1536), dtype=np.float32))
         assert results == []
 
     def test_filter_by_type(self):

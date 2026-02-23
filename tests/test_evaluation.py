@@ -74,6 +74,8 @@ class TestEvaluateGeneration:
             assert "strategy" in results
             assert "avg_scores" in results
             assert results["strategy"] == "few_shot"
+            for key in ("risk_accuracy", "issue_coverage", "actionability", "grounding", "total"):
+                assert key in results["avg_scores"], f"Missing avg_scores key: {key}"
 
 
 class TestJudgePrompt:

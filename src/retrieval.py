@@ -32,7 +32,7 @@ def search_similar_clauses(
     Returns:
         List of dicts with 'clause' (reconstructed from metadata) and 'score'.
     """
-    logger.info("Searching for similar clauses (top_k=%d, filters=%s)", top_k, filters)
+    logger.info("Search: query='%s...', top_k=%d, filters=%s", query[:80], top_k, filters)
     query_embedding = get_embeddings([query], db["provider"])
 
     # L2 normalize using numpy (no FAISS dependency in retrieval layer)
@@ -64,7 +64,10 @@ def search_similar_clauses(
             "score": hit["score"],
         })
 
-    logger.info("Found %d similar clauses", len(results))
+    if results:
+        logger.info("Retrieved %d results, top score: %.3f", len(results), results[0]["score"])
+    else:
+        logger.debug("Retrieved 0 results")
     return results
 
 

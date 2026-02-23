@@ -15,7 +15,7 @@ class TestGetEmbeddings:
         result = get_embeddings(texts, mock_provider)
         assert isinstance(result, np.ndarray)
         assert result.shape[0] == 2
-        assert result.shape[1] == 128
+        assert result.shape[1] == 1536
 
 
 class TestInferPracticeArea:

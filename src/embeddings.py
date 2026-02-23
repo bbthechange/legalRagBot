@@ -165,7 +165,7 @@ def load_documents(
         metadata.append(flat)
 
     count = store.upsert(ids, embeddings, metadata)
-    logger.info("Vector store loaded with %d vectors", count)
+    logger.info("Vector store loaded: %d vectors via %s", count, provider.provider_name)
     print(f"Vector store ({provider_name}) loaded with {count} vectors")
 
     # Persist if path given
