@@ -31,9 +31,33 @@ class TestAnalyzeClause:
             result = analyze_clause("test clause", loaded_faiss_db)
 
             assert "analysis" in result
-            assert "retrieved_clauses" in result
+            assert "sources" in result
             assert "strategy" in result
             assert "model" in result
+            assert "review_status" in result
+            assert "disclaimer" in result
+            assert "top_k" in result
+
+    def test_sources_replaces_retrieved_clauses(self, loaded_faiss_db):
+        with patch("src.rag_pipeline.search_similar_clauses") as mock_search, \
+             patch("src.rag_pipeline.generate_analysis") as mock_gen:
+            mock_search.return_value = [
+                {
+                    "clause": {
+                        "id": "nda-001", "title": "Test NDA", "type": "NDA",
+                        "category": "c", "text": "t", "risk_level": "low",
+                        "notes": "n",
+                    },
+                    "score": 0.85,
+                },
+            ]
+            mock_gen.return_value = '{"risk_level": "low"}'
+
+            result = analyze_clause("test clause", loaded_faiss_db)
+
+            assert "retrieved_clauses" not in result
+            assert len(result["sources"]) == 1
+            assert result["sources"][0]["id"] == "nda-001"
 
     def test_works_with_each_strategy(self, loaded_faiss_db):
         for strategy_name in STRATEGIES:
@@ -55,3 +79,13 @@ class TestAnalyzeClause:
 
             result = analyze_clause("test clause", loaded_faiss_db)
             assert result["strategy"] == "few_shot"
+
+    def test_review_status_and_disclaimer(self, loaded_faiss_db):
+        with patch("src.rag_pipeline.search_similar_clauses") as mock_search, \
+             patch("src.rag_pipeline.generate_analysis") as mock_gen:
+            mock_search.return_value = []
+            mock_gen.return_value = "analysis"
+
+            result = analyze_clause("test clause", loaded_faiss_db)
+            assert result["review_status"] == "pending_review"
+            assert "DRAFT" in result["disclaimer"]

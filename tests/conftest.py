@@ -30,13 +30,18 @@ class MockProvider:
              temperature=0.2, max_tokens=1500) -> str:
         """Return canned structured JSON response."""
         return json.dumps({
-            "assumptions": ["Test assumption"],
+            "assumptions": ["Mock assumption"],
             "risk_level": "medium",
-            "risk_summary": "Test risk summary",
-            "key_issues": ["Test issue 1", "Test issue 2"],
-            "comparison": "Test comparison",
-            "suggested_revisions": "Test revisions",
-            "jurisdiction_notes": "Test jurisdiction notes",
+            "risk_summary": "Mock risk summary",
+            "key_issues": ["Mock issue 1"],
+            "comparison": "Similar to [test-001]. Mock comparison.",
+            "suggested_revisions": "Mock revision",
+            "jurisdiction_notes": "Mock jurisdiction note",
+            "sources_used": [
+                {"id": "test-001", "title": "Test NDA Clause", "relevance": "Mock relevance"}
+            ],
+            "confidence": "medium",
+            "confidence_rationale": "Mock confidence rationale",
         })
 
 

@@ -8,7 +8,9 @@ compared against each other via the evaluation framework.
 
 # --- Strategy 1: Basic (baseline) ---
 
-BASIC_SYSTEM_PROMPT = """You are a legal assistant. Analyze the contract clause provided by the user."""
+BASIC_SYSTEM_PROMPT = """You are a legal assistant. Analyze the contract clause provided by the user.
+
+When referencing information from the knowledge base, cite the source ID in square brackets (e.g., [nda-001]). Include a "sources_used" list in your response identifying which sources informed your analysis."""
 
 def build_basic_prompt(query_clause: str, retrieved_context: str) -> list[dict]:
     """Minimal prompt — serves as the baseline for strategy comparison."""
@@ -39,7 +41,10 @@ Provide your analysis in the following JSON format:
     "key_issues": ["List of specific issues found"],
     "comparison": "How this clause compares to the similar clauses from the knowledge base",
     "suggested_revisions": "Specific language changes to improve the clause",
-    "jurisdiction_notes": "Any jurisdiction-specific concerns (e.g., state law variations)"
+    "jurisdiction_notes": "Any jurisdiction-specific concerns (e.g., state law variations)",
+    "sources_used": [{"id": "clause-id", "title": "clause title", "relevance": "why this source was relevant"}],
+    "confidence": "high | medium | low",
+    "confidence_rationale": "Why you're confident or not in this analysis"
 }
 
 Guidelines:
@@ -48,7 +53,9 @@ Guidelines:
 - Be specific and cite exact language from the clause when identifying issues
 - Consider enforceability across major US jurisdictions
 - Prioritize practical, actionable advice over theoretical concerns
-- If the clause is well-drafted, say so — don't invent problems"""
+- If the clause is well-drafted, say so — don't invent problems
+- ALWAYS cite source IDs from the knowledge base when making comparisons or referencing similar clauses. Use the format [source-id] inline.
+- Include a confidence level. High = multiple corroborating sources and clear legal standards. Medium = some relevant sources but analysis requires interpretation. Low = limited relevant sources or novel clause structure."""
 
 def build_structured_prompt(query_clause: str, retrieved_context: str) -> list[dict]:
     """Detailed system prompt with persona, JSON schema, and behavioral guidelines."""
@@ -68,7 +75,7 @@ Provide your analysis in the specified JSON format."""},
 
 # --- Strategy 3: Few-Shot (includes worked example) ---
 
-FEW_SHOT_SYSTEM_PROMPT = """You are a senior legal analyst at a large law firm specializing in contract review. Analyze contract clauses and provide risk assessments following the format shown in the examples below."""
+FEW_SHOT_SYSTEM_PROMPT = """You are a senior legal analyst at a large law firm specializing in contract review. Analyze contract clauses and provide risk assessments following the format shown in the examples below. Cite source IDs in square brackets (e.g., [nda-001]) when referencing knowledge base sources."""
 
 # Worked example teaches the model expected format, tone, and depth
 FEW_SHOT_EXAMPLES = [
@@ -97,9 +104,23 @@ Similar clauses from knowledge base:
         "No limitation to specific business lines or roles",
         "Applies to 'any competitor' which is vague and overinclusive"
     ],
-    "comparison": "This clause is even more restrictive than the 'Overly Broad Non-Compete' in the knowledge base (3 years worldwide, rated high risk). It exceeds that by 2 additional years. The knowledge base's reasonable example uses 12 months and 50 miles — a dramatic contrast.",
+    "comparison": "This clause is even more restrictive than the 'Overly Broad Non-Compete' [emp-002] in the knowledge base (3 years worldwide, rated high risk). It exceeds that by 2 additional years. The knowledge base's reasonable example [emp-001] uses 12 months and 50 miles — a dramatic contrast.",
     "suggested_revisions": "Reduce duration to 12 months. Limit geography to markets where contractor actively worked. Narrow scope to specific competing services rather than 'any competitor'. Add consideration clause if not already present.",
-    "jurisdiction_notes": "California bans non-competes entirely (Cal. Bus. & Prof. Code 16600). Many states require reasonable limits on time, geography, and scope. Even in employer-friendly states like Florida, 5 years would likely be struck down or blue-penciled."
+    "jurisdiction_notes": "California bans non-competes entirely (Cal. Bus. & Prof. Code 16600). Many states require reasonable limits on time, geography, and scope. Even in employer-friendly states like Florida, 5 years would likely be struck down or blue-penciled.",
+    "sources_used": [
+        {
+            "id": "emp-001",
+            "title": "Reasonable Non-Compete Clause",
+            "relevance": "Baseline for reasonable duration and geographic scope"
+        },
+        {
+            "id": "emp-002",
+            "title": "Overly Broad Non-Compete",
+            "relevance": "Similar overbroad pattern — worldwide scope, excessive duration"
+        }
+    ],
+    "confidence": "high",
+    "confidence_rationale": "Multiple non-compete clauses in knowledge base establish clear enforceability standards. Duration and scope analysis is well-settled law across US jurisdictions."
 }"""
     },
 ]

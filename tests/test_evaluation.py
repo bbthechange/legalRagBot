@@ -55,9 +55,12 @@ class TestEvaluateGeneration:
         with patch("src.evaluation.analyze_clause") as mock_analyze:
             mock_analyze.return_value = {
                 "analysis": "test analysis",
-                "retrieved_clauses": [],
+                "sources": [],
                 "strategy": "few_shot",
                 "model": "mock",
+                "top_k": 3,
+                "review_status": "pending_review",
+                "disclaimer": "DRAFT ANALYSIS — Requires Attorney Review.",
             }
 
             monkeypatch.setattr(

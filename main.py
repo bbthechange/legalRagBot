@@ -114,16 +114,32 @@ def interactive_mode(db: dict):
         print("\nSearching knowledge base and generating analysis...")
         result = analyze_clause(clause_text, db, strategy=strategy)
 
-        # Display retrieved clauses
-        print("\n--- Retrieved Similar Clauses ---")
-        for i, r in enumerate(result["retrieved_clauses"], 1):
-            clause = r["clause"]
-            print(f"  {i}. {clause['title']} "
-                  f"(similarity: {r['score']:.3f}, risk: {clause['risk_level']})")
+        # Display draft header
+        print(f"\n{'=' * 60}")
+        print(f"  DRAFT ANALYSIS — Requires Attorney Review")
+        print(f"  Strategy: {result['strategy']} | Model: {result['model']}")
+        print(f"{'=' * 60}")
+
+        # Display source trail
+        print(f"\n--- Sources Retrieved ({len(result['sources'])}) ---")
+        for src in result["sources"]:
+            print(f"  [{src['id']}] {src['title']} "
+                  f"(relevance: {src['score']:.3f}, risk: {src['risk_level']})")
 
         # Display analysis
-        print(f"\n--- Analysis (strategy: {result['strategy']}, model: {result['model']}) ---")
-        print(result["analysis"])
+        print(f"\n--- Analysis ---")
+        analysis = result["analysis"]
+        if isinstance(analysis, dict):
+            import json
+            print(json.dumps(analysis, indent=2))
+        else:
+            print(analysis)
+
+        # Display footer
+        print(f"\n{'=' * 60}")
+        print(f"  Review Status: {result['review_status'].upper()}")
+        print(f"  {result['disclaimer']}")
+        print(f"{'=' * 60}")
 
 
 def main():

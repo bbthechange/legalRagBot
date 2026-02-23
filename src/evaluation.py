@@ -164,12 +164,17 @@ def evaluate_generation(db: dict, strategy: str = "few_shot") -> dict:
             test["clause"], db, strategy=strategy
         )
 
+        # Get analysis as string for the judge prompt
+        analysis_text = pipeline_result["analysis"]
+        if isinstance(analysis_text, dict):
+            analysis_text = json.dumps(analysis_text, indent=2)
+
         judge_messages = [
             {"role": "system", "content": "You are an expert legal AI evaluator. Return only valid JSON."},
             {"role": "user", "content": JUDGE_PROMPT.format(
                 expected_risk=test["expected_risk_level"],
                 must_identify=", ".join(test["must_identify"]),
-                analysis=pipeline_result["analysis"],
+                analysis=analysis_text,
             )},
         ]
 

@@ -24,12 +24,24 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 
-def get_embeddings(texts: list[str], provider) -> np.ndarray:
+def get_embeddings(texts: list[str], provider, batch_size: int = 100) -> np.ndarray:
     """
-    Convert a list of text strings into vector embeddings via the configured provider.
-    Returns a float32 numpy array with shape (len(texts), embedding_dim).
+    Convert text strings into vector embeddings, batching for API limits.
+
+    OpenAI allows up to 2048 texts per request, but large batches risk
+    token limits. Default batch_size=100 is safe for most text lengths.
     """
-    return provider.embed(texts)
+    if len(texts) <= batch_size:
+        return provider.embed(texts)
+
+    all_embeddings = []
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i:i + batch_size]
+        logger.info(f"Embedding batch {i//batch_size + 1}/{(len(texts)-1)//batch_size + 1} ({len(batch)} texts)")
+        embeddings = provider.embed(batch)
+        all_embeddings.append(embeddings)
+
+    return np.concatenate(all_embeddings, axis=0)
 
 
 def infer_practice_area(clause_type: str) -> str:
