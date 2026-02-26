@@ -74,13 +74,17 @@
         }
       }
 
-      <!-- Walk-Away Callout -->
-      @if (walkAways().length) {
+      <!-- Critical Issues Callout -->
+      @if (criticalIssues().length) {
         <div class="walkaway-callout">
           <h3>Critical Issues</h3>
-          @for (w of walkAways(); track w.clause_type) {
+          @for (w of criticalIssues(); track w.clause_type) {
             <div class="walkaway-item">
-              <app-risk-badge level="walk_away" label="WALK-AWAY" />
+              @if (w.playbook_match === 'walk_away') {
+                <app-risk-badge level="walk_away" label="WALK-AWAY" />
+              } @else {
+                <app-risk-badge level="high" label="HIGH RISK" />
+              }
               <span>{{ w.clause_type }}</span>
               @if (w.gaps.length) {
                 <span class="walkaway-gap">&mdash; {{ w.gaps[0].issue }}</span>

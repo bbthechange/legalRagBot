@@ -45,7 +45,7 @@ export class ContractReviewComponent {
     return list;
   });
 
-  walkAways = computed(() => {
+  criticalIssues = computed(() => {
     const r = this.response();
     if (!r) return [];
     return r.clause_analyses.filter((c: any) => c.playbook_match === 'walk_away' || c.risk_level?.toLowerCase() === 'high');
