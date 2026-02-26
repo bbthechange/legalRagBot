@@ -152,6 +152,19 @@
                     <p>{{ clause.negotiation_notes }}</p>
                   </div>
                 }
+                @if (clause.retrieval_sources?.length) {
+                  <div class="detail-block sources-block">
+                    <h4>Knowledge Base Sources</h4>
+                    @for (src of clause.retrieval_sources; track src.id) {
+                      <div class="source-row">
+                        <span class="source-title">{{ src.title }}</span>
+                        <span class="similarity-badge" [attr.data-level]="src.similarity.toLowerCase()">
+                          {{ src.similarity }} similarity
+                        </span>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
             }
           </div>

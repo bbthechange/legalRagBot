@@ -17,6 +17,15 @@ from src.output_parser import parse_json_response_or_raw
 logger = logging.getLogger(__name__)
 
 
+def _similarity_label(score: float) -> str:
+    """Convert a cosine similarity score to a qualitative label."""
+    if score >= 0.80:
+        return "Strong"
+    if score >= 0.60:
+        return "Moderate"
+    return "Weak"
+
+
 def load_playbook(playbook_path: str) -> dict:
     """Load a playbook JSON file."""
     with open(playbook_path) as f:
@@ -73,6 +82,14 @@ def review_clause_against_playbook(
     """Review a single clause against its playbook position."""
     similar = search_similar_clauses(clause["text"], db, top_k=3)
     context = format_retrieval_results(similar)
+    retrieval_sources = [
+        {
+            "id": r["clause"].get("id", ""),
+            "title": r["clause"].get("title", ""),
+            "similarity": _similarity_label(r["score"]),
+        }
+        for r in similar
+    ]
 
     messages = [
         {"role": "system", "content": "You are an expert contract review attorney. Return only valid JSON."},
@@ -102,6 +119,7 @@ def review_clause_against_playbook(
         parsed["position_in_contract"] = clause["position"]
         parsed["heading"] = clause.get("heading")
         parsed["preferred_position"] = playbook_position.get("preferred_position", "")
+        parsed["retrieval_sources"] = retrieval_sources
 
     return parsed
 
@@ -146,6 +164,7 @@ def review_contract(
                 "negotiation_notes": f"This clause type ({clause['clause_type']}) is not covered by the {playbook['name']} playbook.",
                 "extracted_text": clause["text"][:500],
                 "position_in_contract": clause["position"],
+                "retrieval_sources": [],
             }
 
     # Review matched clauses in parallel
@@ -171,6 +190,7 @@ def review_contract(
                         "negotiation_notes": "Review failed due to an internal error. Manual review required.",
                         "extracted_text": clause["text"][:500],
                         "position_in_contract": clause["position"],
+                        "retrieval_sources": [],
                     }
 
     summary = _build_contract_summary(clause_analyses, playbook)

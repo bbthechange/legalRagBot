@@ -46,6 +46,12 @@ export interface ContractReviewRequest {
   playbook: string;
 }
 
+export interface RetrievalSource {
+  id: string;
+  title: string;
+  similarity: 'Strong' | 'Moderate' | 'Weak';
+}
+
 export interface ClauseReviewDetail {
   clause_type: string;
   risk_level: string;
@@ -55,6 +61,7 @@ export interface ClauseReviewDetail {
   gaps: { issue: string; severity: string; playbook_says?: string; clause_says?: string }[];
   suggested_redline?: string;
   negotiation_notes?: string;
+  retrieval_sources?: RetrievalSource[];
 }
 
 export interface ContractReviewSummary {

@@ -9,6 +9,7 @@ from src.playbook_review import (
     find_playbook_position,
     review_contract,
     _build_contract_summary,
+    _similarity_label,
 )
 
 
@@ -104,6 +105,12 @@ def test_review_contract_with_mocked_extraction(
         assert "playbook_match" in a
         assert "extracted_text" in a
         assert "position_in_contract" in a
+        assert "retrieval_sources" in a
+        assert isinstance(a["retrieval_sources"], list)
+        for src in a["retrieval_sources"]:
+            assert "id" in src
+            assert "title" in src
+            assert src["similarity"] in ("Strong", "Moderate", "Weak")
 
     # Verify summary uses the spec's flat keys
     summary = result["summary"]
@@ -113,6 +120,21 @@ def test_review_contract_with_mocked_extraction(
     assert "walk_away_triggered" in summary
     assert "not_in_playbook" in summary
     assert "overall_risk" in summary
+
+
+class TestSimilarityLabel:
+    def test_strong(self):
+        assert _similarity_label(0.80) == "Strong"
+        assert _similarity_label(0.95) == "Strong"
+        assert _similarity_label(1.0) == "Strong"
+
+    def test_moderate(self):
+        assert _similarity_label(0.60) == "Moderate"
+        assert _similarity_label(0.75) == "Moderate"
+
+    def test_weak(self):
+        assert _similarity_label(0.59) == "Weak"
+        assert _similarity_label(0.0) == "Weak"
 
 
 def test_build_contract_summary_counts():
