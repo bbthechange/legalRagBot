@@ -1,0 +1,164 @@
+<div class="contract-review">
+  <!-- Input -->
+  @if (inputExpanded()) {
+    <section class="input-section">
+      <h2>Contract Review</h2>
+
+      <div class="playbook-cards">
+        @for (pb of playbooks; track pb.id) {
+          <button
+            class="playbook-card"
+            [class.selected]="selectedPlaybook() === pb.id"
+            (click)="selectedPlaybook.set(pb.id)">
+            <span class="playbook-label">{{ pb.label }}</span>
+            <span class="playbook-desc">{{ pb.desc }}</span>
+          </button>
+        }
+      </div>
+
+      <textarea
+        class="contract-input"
+        [(ngModel)]="contractText"
+        placeholder="Paste the contract"
+        rows="8"></textarea>
+
+      <button class="btn-analyze" [disabled]="!contractText.trim() || loading()" (click)="analyze()">
+        {{ loading() ? 'Analyzing...' : 'Analyze' }}
+      </button>
+    </section>
+  } @else {
+    <section class="input-collapsed">
+      <span class="collapsed-playbook">{{ playbookLabel() }}</span>
+      <span class="collapsed-preview">{{ contractText.slice(0, 80) }}{{ contractText.length > 80 ? '...' : '' }}</span>
+      <button class="collapsed-edit" (click)="inputExpanded.set(true)">Edit</button>
+    </section>
+  }
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  @if (response()) {
+    <div class="output-section">
+      <!-- Summary Bar -->
+      @if (summary(); as s) {
+        <div class="summary-bar">
+          <div class="summary-stat">
+            <span class="stat-number">{{ s.total_clauses_reviewed || response()!.total_clauses }}</span>
+            <span class="stat-label">Total Clauses</span>
+          </div>
+          <div class="summary-stat stat-preferred">
+            <span class="stat-number">{{ s.preferred_match }}</span>
+            <span class="stat-label">Preferred</span>
+          </div>
+          <div class="summary-stat stat-fallback">
+            <span class="stat-number">{{ s.fallback_match }}</span>
+            <span class="stat-label">Fallback</span>
+          </div>
+          <div class="summary-stat stat-walkaway">
+            <span class="stat-number">{{ s.walk_away_triggered }}</span>
+            <span class="stat-label">Walk-Away</span>
+          </div>
+          <div class="summary-stat stat-notcovered">
+            <span class="stat-number">{{ s.not_in_playbook }}</span>
+            <span class="stat-label">Not Covered</span>
+          </div>
+        </div>
+
+        @if (s.critical_issues?.length) {
+          <ul class="critical-issues">
+            @for (issue of s.critical_issues; track issue) {
+              <li>{{ issue }}</li>
+            }
+          </ul>
+        }
+      }
+
+      <!-- Walk-Away Callout -->
+      @if (walkAways().length) {
+        <div class="walkaway-callout">
+          <h3>Critical Issues</h3>
+          @for (w of walkAways(); track w.clause_type) {
+            <div class="walkaway-item">
+              <app-risk-badge level="walk_away" label="WALK-AWAY" />
+              <span>{{ w.clause_type }}</span>
+              @if (w.gaps?.length) {
+                <span class="walkaway-gap">&mdash; {{ w.gaps[0].issue }}</span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Clause List -->
+      <div class="clause-list-header">
+        <h3>Clause Analysis</h3>
+        <label class="sort-toggle">
+          <input type="checkbox" [checked]="sortByRisk()" (change)="sortByRisk.set(!sortByRisk())" />
+          Sort by risk
+        </label>
+      </div>
+
+      <div class="clause-list">
+        @for (clause of clauses(); track clause.clause_type; let i = $index) {
+          <div class="clause-row" [class.expanded]="expandedClause() === i">
+            <button class="clause-header" (click)="toggleClause(i)">
+              <app-risk-badge [level]="clause.risk_level || clause.playbook_match" />
+              <span class="clause-type">{{ clause.clause_type }}</span>
+              <span class="match-status" [class]="'match-' + clause.playbook_match">
+                {{ matchLabel(clause.playbook_match) }}
+              </span>
+              <span class="expand-icon">{{ expandedClause() === i ? '&#9650;' : '&#9660;' }}</span>
+            </button>
+
+            @if (expandedClause() === i) {
+              <div class="clause-detail">
+                @if (clause.extracted_text) {
+                  <div class="detail-block">
+                    <h4>Extracted Clause</h4>
+                    <p class="clause-text">{{ clause.extracted_text }}</p>
+                  </div>
+                }
+                @if (clause.preferred_position) {
+                  <div class="detail-block">
+                    <h4>Playbook Preferred Position</h4>
+                    <p class="preferred-text">{{ clause.preferred_position }}</p>
+                  </div>
+                }
+                @if (clause.gaps?.length) {
+                  <div class="detail-block">
+                    <h4>Gaps Identified</h4>
+                    @for (gap of clause.gaps; track gap.issue) {
+                      <div class="gap-row">
+                        <span class="severity-dot" [class]="'severity-' + (gap.severity || 'medium')"></span>
+                        <span>{{ gap.issue }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (clause.suggested_redline) {
+                  <div class="detail-block">
+                    <h4>Suggested Redline</h4>
+                    <p class="revision-text">{{ clause.suggested_redline }}</p>
+                  </div>
+                }
+                @if (clause.negotiation_notes) {
+                  <div class="detail-block notes-block">
+                    <h4>Negotiation Notes</h4>
+                    <p>{{ clause.negotiation_notes }}</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <app-action-bar
+      (sendForReview)="null"
+      (exportWord)="null"
+      (exportPdf)="null"
+      (routeToSpecialist)="null" />
+  }
+</div>

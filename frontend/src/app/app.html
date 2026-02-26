@@ -1,0 +1,47 @@
+<div class="app-shell">
+  <div class="letterhead-line"></div>
+
+  <header class="app-header">
+    <div class="header-left">
+      <h1 class="app-title">Attorney Review Workbench</h1>
+      <span class="app-subtitle">Draft Analysis &middot; Attorney Review Required</span>
+    </div>
+    <div class="header-right">
+      <span class="health-indicator" [class.healthy]="healthStatus() === 'healthy'" [class.degraded]="healthStatus() === 'degraded'">
+        <span class="health-dot"></span>
+        {{ healthStatus() === 'healthy' ? 'System Operational' : healthStatus() === 'degraded' ? 'Degraded' : 'Connecting...' }}
+      </span>
+      @if (healthDetails()) {
+        <span class="health-meta mono">{{ healthDetails()!.document_count | number }} documents &middot; {{ healthDetails()!.provider }}</span>
+      }
+    </div>
+  </header>
+
+  <nav class="tab-bar">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-button"
+        [class.active]="activeTab() === tab.id"
+        (click)="activeTab.set(tab.id)">
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  <main class="tab-content">
+    @switch (activeTab()) {
+      @case ('clause') {
+        <app-clause-analysis />
+      }
+      @case ('contract') {
+        <app-contract-review />
+      }
+      @case ('breach') {
+        <app-breach-response />
+      }
+      @case ('kb') {
+        <app-knowledge-base />
+      }
+    }
+  </main>
+</div>

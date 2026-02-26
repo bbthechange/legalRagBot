@@ -1,0 +1,171 @@
+<div class="breach-response">
+  <!-- Input Form -->
+  <section class="input-section">
+    <h2>Breach Response</h2>
+
+    <div class="form-group">
+      <label class="form-label">Data Types Compromised</label>
+      <div class="pill-toggles">
+        @for (dt of dataTypes; track dt.id) {
+          <button
+            class="pill-toggle"
+            [class.active]="selectedDataTypes().has(dt.id)"
+            (click)="toggleDataType(dt.id)">
+            {{ dt.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Affected States</label>
+      <div class="pill-toggles">
+        @for (state of states; track state) {
+          <button
+            class="pill-toggle state-pill"
+            [class.active]="selectedStates().has(state)"
+            (click)="toggleState(state)">
+            {{ state }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="affected-count">Affected Individuals</label>
+        <input id="affected-count" type="number" class="form-input" [(ngModel)]="affectedCount" placeholder="Number or leave blank" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="encryption">Encryption Status</label>
+        <select id="encryption" class="form-select" [(ngModel)]="encryptionStatus">
+          @for (opt of encryptionOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="discovery-date">Date of Discovery</label>
+        <input id="discovery-date" type="date" class="form-input" [(ngModel)]="discoveryDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="entity-type">Entity Type</label>
+        <select id="entity-type" class="form-select" [(ngModel)]="entityType">
+          @for (opt of entityTypes; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-analyze" [disabled]="selectedDataTypes().size === 0 || selectedStates().size === 0 || loading()" (click)="analyze()">
+      {{ loading() ? 'Generating...' : 'Generate notification matrix' }}
+    </button>
+  </section>
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  @if (response()) {
+    <div class="output-section">
+      <!-- Roll-up Cards -->
+      @if (summary(); as s) {
+        <div class="rollup-cards">
+          <div class="rollup-card">
+            <span class="rollup-number">{{ s.notifications_required }}</span>
+            <span class="rollup-label">Jurisdictions Requiring Notification</span>
+          </div>
+          <div class="rollup-card rollup-urgent">
+            <span class="rollup-number">{{ s.earliest_deadline || 'TBD' }}</span>
+            <span class="rollup-label">Earliest Deadline{{ s.earliest_deadline_state ? ' (' + s.earliest_deadline_state + ')' : '' }}</span>
+          </div>
+          <div class="rollup-card">
+            <span class="rollup-number">{{ s.ag_notifications_required.length }}</span>
+            <span class="rollup-label">AG Notifications Required</span>
+          </div>
+          <div class="rollup-card">
+            <span class="rollup-number">{{ s.safe_harbor_applies === true ? 'Yes' : s.safe_harbor_applies === false ? 'No' : 'See Analysis' }}</span>
+            <span class="rollup-label">Safe Harbor{{ s.safe_harbor_reason ? ' \u2014 ' + s.safe_harbor_reason : '' }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button [class.active]="viewMode() === 'timeline'" (click)="viewMode.set('timeline')">Action Timeline</button>
+        <button [class.active]="viewMode() === 'matrix'" (click)="viewMode.set('matrix')">Matrix</button>
+      </div>
+
+      <!-- Action Timeline -->
+      @if (viewMode() === 'timeline') {
+        <div class="timeline">
+          @for (entry of timelineEntries(); track entry.jurisdiction) {
+            <div class="timeline-entry">
+              <div class="timeline-deadline" [class.urgent]="entry.confidence === 'high'">
+                {{ entry.deadline || 'No fixed deadline' }}
+              </div>
+              <div class="timeline-body">
+                <p class="timeline-action">
+                  <strong>{{ entry.jurisdiction }}:</strong> {{ entry.rationale }}
+                </p>
+                @if (entry.notify_ag) {
+                  <p class="timeline-ag">AG notification required. {{ entry.ag_notification_details }}</p>
+                }
+                @if (entry.special_considerations?.length) {
+                  <ul class="timeline-considerations">
+                    @for (sc of entry.special_considerations; track sc) {
+                      <li>{{ sc }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Matrix View -->
+      @if (viewMode() === 'matrix') {
+        <div class="matrix-wrapper">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>State</th>
+                <th>Notification</th>
+                <th>Deadline</th>
+                <th>Notify Individuals</th>
+                <th>Notify AG</th>
+                <th>Safe Harbor</th>
+                <th>Special Considerations</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of response()!.state_analyses; track entry.jurisdiction) {
+                <tr>
+                  <td class="td-state">{{ entry.jurisdiction }}</td>
+                  <td>
+                    <span class="bool-badge" [class.yes]="entry.notification_required" [class.no]="!entry.notification_required">
+                      {{ entry.notification_required ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td [class.urgent-text]="true">{{ entry.deadline || '\u2014' }}</td>
+                  <td>{{ entry.notification_required ? 'Yes' : 'No' }}</td>
+                  <td>{{ entry.notify_ag ? 'Yes' : 'No' }}</td>
+                  <td>{{ entry.safe_harbor_applies ? 'Yes' : 'No' }}</td>
+                  <td class="td-considerations">{{ entry.special_considerations?.join('; ') || '\u2014' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <app-action-bar
+      (sendForReview)="null"
+      (exportWord)="null"
+      (exportPdf)="null"
+      (routeToSpecialist)="null" />
+  }
+</div>

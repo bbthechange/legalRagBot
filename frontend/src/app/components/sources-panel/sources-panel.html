@@ -1,0 +1,46 @@
+<aside class="sources-panel">
+  <h3 class="panel-title">Sources &amp; Provenance</h3>
+
+  @if (confidence()) {
+    <div class="confidence-block">
+      <span class="confidence-label">Confidence:</span>
+      <span class="confidence-value">{{ confidence() }}</span>
+      @if (confidenceReason()) {
+        <span class="confidence-reason">&mdash; {{ confidenceReason() }}</span>
+      }
+    </div>
+  }
+
+  <div class="sources-list">
+    @for (source of sources(); track source.id; let i = $index) {
+      <div
+        class="source-card"
+        #sourceCard
+        [class.expanded]="expandedIndex() === i"
+        [class.source-highlighted]="highlightedIndex() === i"
+        (click)="toggleExpand(i)">
+        <div class="source-header">
+          <span class="source-number">[{{ i + 1 }}]</span>
+          <div class="source-meta">
+            <span class="source-title">{{ source.title }}</span>
+            <div class="source-tags">
+              <span class="collection-tag">{{ collectionLabel(source) }}</span>
+              <span class="score-tag mono">{{ source.score | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+        @if (expandedIndex() === i && source.text) {
+          <div class="source-passage">
+            <p>{{ source.text }}</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (provenance()) {
+    <div class="provenance-line mono">
+      {{ provenance() }}
+    </div>
+  }
+</aside>

@@ -1,0 +1,28 @@
+<footer class="action-bar">
+  <div class="action-buttons">
+    <button class="btn-primary" (click)="onSendForReview()">
+      {{ hasEdits() ? 'Send for review \u2014 with revisions' : 'Send for review \u2014 no revisions' }}
+    </button>
+
+    <div class="route-wrapper">
+      <button class="btn-secondary" (click)="showRouteMenu.set(!showRouteMenu())">
+        Route to specialist
+        <span class="caret">&#9662;</span>
+      </button>
+      @if (showRouteMenu()) {
+        <div class="route-dropdown">
+          @for (s of specialists; track s) {
+            <button class="route-option" (click)="onRouteToSpecialist(s)">{{ s }}</button>
+          }
+        </div>
+      }
+    </div>
+
+    <button class="btn-secondary" (click)="onExportWord()">Export to Word</button>
+    <button class="btn-secondary" (click)="onExportPdf()">Export PDF</button>
+  </div>
+
+  <p class="action-context">
+    Approved analyses are logged to the audit trail and can be exported as memos or structured data.
+  </p>
+</footer>

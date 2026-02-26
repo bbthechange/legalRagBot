@@ -1,0 +1,55 @@
+<div class="knowledge-base">
+  <!-- Search Input -->
+  <section class="search-section">
+    <h2>Knowledge Base</h2>
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        [(ngModel)]="query"
+        placeholder="Ask a legal question..."
+        (keydown.enter)="search()" />
+      <button class="btn-search" [disabled]="!query.trim() || loading()" (click)="search()">
+        {{ loading() ? 'Searching...' : 'Search' }}
+      </button>
+    </div>
+  </section>
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  @if (response()) {
+    <div class="output-section">
+      <div class="output-main">
+        <!-- Answer -->
+        @if (answer(); as a) {
+          <div class="answer-block">
+            <p class="answer-text">{{ a.answer }}</p>
+
+            @if (a.caveats?.length) {
+              <p class="answer-caveats">{{ a.caveats!.join('. ') }}</p>
+            }
+          </div>
+        }
+
+        <!-- Related Questions -->
+        @if (relatedQuestions().length) {
+          <div class="related-questions">
+            @for (q of relatedQuestions(); track q) {
+              <button class="related-pill" (click)="searchRelated(q)">{{ q }}</button>
+            }
+          </div>
+        }
+
+        <!-- Routing Indicator -->
+        @if (routing()) {
+          <p class="routing-indicator mono">{{ routing() }}</p>
+        }
+      </div>
+
+      <!-- Sources -->
+      <app-sources-panel [sources]="sources()" />
+    </div>
+  }
+</div>

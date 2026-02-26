@@ -1,0 +1,118 @@
+<div class="clause-analysis">
+  <!-- Input Section -->
+  <section class="input-section">
+    <div class="input-header">
+      <h2>Clause Analysis</h2>
+      <div class="strategy-pills">
+        @for (s of strategies; track s.id) {
+          <button
+            class="strategy-pill"
+            [class.active]="strategy() === s.id"
+            [title]="s.hint"
+            (click)="strategy.set(s.id)">
+            {{ s.label }}
+          </button>
+        }
+      </div>
+    </div>
+    <textarea
+      class="clause-input"
+      [(ngModel)]="clauseText"
+      placeholder="Paste the clause text"
+      rows="5"></textarea>
+    <button class="btn-analyze" [disabled]="!clauseText.trim() || loading()" (click)="analyze()">
+      {{ loading() ? 'Analyzing...' : 'Analyze' }}
+    </button>
+  </section>
+
+  @if (error()) {
+    <div class="error-banner">{{ error() }}</div>
+  }
+
+  <!-- Output Section -->
+  @if (response()) {
+    <div class="output-section">
+      <div class="output-main">
+        @if (analysis(); as a) {
+          <!-- Risk + Assumptions -->
+          <div class="risk-assumptions">
+            <app-risk-badge [level]="a.risk_level" />
+            <span class="assumptions-text">
+              &mdash;
+              @for (assumption of a.assumptions; track assumption; let last = $last) {
+                {{ assumption }}{{ last ? '' : ', ' }}
+              }
+            </span>
+          </div>
+          <p class="assumptions-hint">If any assumption is incorrect, re-analyze with corrections.</p>
+
+          <!-- Key Issues -->
+          @if (normalizedKeyIssues().length) {
+            <div class="key-issues">
+              <h3>Key Issues</h3>
+              @for (issue of normalizedKeyIssues(); track issue.issue; let i = $index) {
+                <div class="issue-row">
+                  <span class="severity-dot" [class]="severityClass(issue.severity)"></span>
+                  <span class="issue-text">
+                    {{ issue.issue }}
+                    @if (issue.citation_indices?.length) {
+                      @for (ci of issue.citation_indices; track ci) {
+                        <span class="citation-ref" (click)="onCitationClick(ci - 1)">[{{ ci }}]</span>
+                      }
+                    }
+                  </span>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Suggested Revision -->
+          @if (originalRevision()) {
+            <div class="revision-section">
+              <div class="revision-header">
+                <h3>Suggested Revision</h3>
+                @if (hasEdits()) {
+                  <span class="edit-indicator">Edited</span>
+                  <button class="btn-reset" (click)="resetRevision()">Reset to original</button>
+                }
+              </div>
+              <textarea
+                class="revision-editor"
+                [ngModel]="editedRevision()"
+                (ngModelChange)="editedRevision.set($event)"
+                rows="4"></textarea>
+            </div>
+          }
+
+          <!-- Jurisdiction Notes -->
+          @if (a.jurisdiction_notes) {
+            <div class="jurisdiction-notes">
+              <h4>Jurisdiction Notes</h4>
+              <p>{{ a.jurisdiction_notes }}</p>
+            </div>
+          }
+        } @else {
+          <!-- Raw string analysis fallback -->
+          <div class="raw-analysis">
+            <pre>{{ response()!.analysis }}</pre>
+          </div>
+        }
+      </div>
+
+      <!-- Sources Panel -->
+      <app-sources-panel
+        [sources]="sources()"
+        [provenance]="provenance()"
+        [confidence]="analysis()?.confidence || ''"
+        [confidenceReason]="analysis()?.confidence_rationale || ''" />
+    </div>
+
+    <!-- Action Bar -->
+    <app-action-bar
+      [hasEdits]="hasEdits()"
+      (sendForReview)="null"
+      (exportWord)="null"
+      (exportPdf)="null"
+      (routeToSpecialist)="null" />
+  }
+</div>
