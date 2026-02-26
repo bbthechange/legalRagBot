@@ -76,7 +76,7 @@ class CuadIngestor(BaseIngestor):
     def load_raw(self) -> list[dict]:
         """Download CUAD from HuggingFace."""
         from datasets import load_dataset
-        dataset = load_dataset("theatticusproject/cuad-qa", split=self.split)
+        dataset = load_dataset("theatticusproject/cuad-qa", split=self.split, revision="refs/convert/parquet")
         return [dict(row) for row in dataset]
 
     def _extract_clause_type(self, question: str) -> str:

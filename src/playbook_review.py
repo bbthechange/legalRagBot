@@ -100,6 +100,7 @@ def review_clause_against_playbook(
         parsed["extracted_text"] = clause["text"][:500]
         parsed["position_in_contract"] = clause["position"]
         parsed["heading"] = clause.get("heading")
+        parsed["preferred_position"] = playbook_position.get("preferred_position", "")
 
     return parsed
 

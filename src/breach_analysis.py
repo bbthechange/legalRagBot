@@ -196,24 +196,37 @@ def _build_summary(breach_params: dict, state_analyses: list[dict]) -> dict:
     notifications_required = 0
     ag_notifications = []
     earliest_deadline = None
+    earliest_deadline_state = None
+    safe_harbor_applies = False
+    safe_harbor_reason = ""
 
     for analysis in state_analyses:
-        if isinstance(analysis, dict) and analysis.get("notification_required"):
+        if not isinstance(analysis, dict):
+            continue
+        if analysis.get("notification_required"):
             notifications_required += 1
-        if isinstance(analysis, dict) and analysis.get("notify_ag"):
+        if analysis.get("notify_ag"):
             jurisdiction = analysis.get("jurisdiction", "Unknown")
             details = analysis.get("ag_notification_details", "")
             ag_notifications.append(f"{jurisdiction}: {details}")
-        deadline = analysis.get("deadline", "") if isinstance(analysis, dict) else ""
+        deadline = analysis.get("deadline", "")
         if deadline and ("day" in deadline.lower() or "hour" in deadline.lower()):
             if earliest_deadline is None or len(deadline) < len(earliest_deadline):
                 earliest_deadline = deadline
+                earliest_deadline_state = analysis.get("jurisdiction")
+        if analysis.get("safe_harbor_applies"):
+            safe_harbor_applies = True
+            if not safe_harbor_reason:
+                safe_harbor_reason = analysis.get("safe_harbor_details", "")
 
     return {
         "total_jurisdictions": len(state_analyses),
         "notifications_required": notifications_required,
         "ag_notifications_required": ag_notifications,
         "earliest_deadline": earliest_deadline or "See individual state analyses",
+        "earliest_deadline_state": earliest_deadline_state,
+        "safe_harbor_applies": safe_harbor_applies,
+        "safe_harbor_reason": safe_harbor_reason,
         "data_types_compromised": breach_params.get("data_types_compromised", []),
         "encryption_status": breach_params.get("encryption_status", "unknown"),
     }

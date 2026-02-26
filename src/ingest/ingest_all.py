@@ -80,7 +80,7 @@ def main():
     start = time.time()
     db = load_documents(documents=all_docs)
     elapsed = time.time() - start
-    logger.info(f"Vector store built in {elapsed:.1f}s with {db['store'].total_vectors} vectors")
+    logger.info(f"Vector store built in {elapsed:.1f}s with {len(all_docs)} documents")
 
     # Persist the index
     store_provider = os.environ.get("VECTOR_STORE_PROVIDER", "faiss")
@@ -99,7 +99,7 @@ def main():
     for src, count in sorted(source_counts.items()):
         print(f"  {src}: {count} documents")
     print(f"  TOTAL: {len(all_docs)} documents")
-    print(f"  Index: {db['store'].total_vectors} vectors")
+    print(f"  Upserted: {len(all_docs)} vectors")
     print(f"{'=' * 50}")
 
 

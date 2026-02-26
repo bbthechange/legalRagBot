@@ -324,6 +324,11 @@ class PineconeVectorStore(VectorStore):
         self._index.delete(ids=ids)
         return len(ids)
 
+    @property
+    def total_vectors(self) -> int:
+        stats = self._index.describe_index_stats()
+        return stats.total_vector_count
+
 
 def create_vector_store(provider: str) -> VectorStore:
     """Factory function to create the configured vector store backend."""
