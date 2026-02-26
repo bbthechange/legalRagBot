@@ -1,67 +1,74 @@
 <div class="breach-response">
   <!-- Input Form -->
-  <section class="input-section">
-    <h2>Breach Response</h2>
+  @if (inputExpanded()) {
+    <section class="input-section">
+      <h2>Breach Response</h2>
 
-    <div class="form-group">
-      <label class="form-label">Data Types Compromised</label>
-      <div class="pill-toggles">
-        @for (dt of dataTypes; track dt.id) {
-          <button
-            class="pill-toggle"
-            [class.active]="selectedDataTypes().has(dt.id)"
-            (click)="toggleDataType(dt.id)">
-            {{ dt.label }}
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Affected States</label>
-      <div class="pill-toggles">
-        @for (state of states; track state) {
-          <button
-            class="pill-toggle state-pill"
-            [class.active]="selectedStates().has(state)"
-            (click)="toggleState(state)">
-            {{ state }}
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="form-row">
       <div class="form-group">
-        <label class="form-label" for="affected-count">Affected Individuals</label>
-        <input id="affected-count" type="number" class="form-input" [(ngModel)]="affectedCount" placeholder="Number or leave blank" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="encryption">Encryption Status</label>
-        <select id="encryption" class="form-select" [(ngModel)]="encryptionStatus">
-          @for (opt of encryptionOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
+        <label class="form-label">Data Types Compromised</label>
+        <div class="pill-toggles">
+          @for (dt of dataTypes; track dt.id) {
+            <button
+              class="pill-toggle"
+              [class.active]="selectedDataTypes().has(dt.id)"
+              (click)="toggleDataType(dt.id)">
+              {{ dt.label }}
+            </button>
           }
-        </select>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="discovery-date">Date of Discovery</label>
-        <input id="discovery-date" type="date" class="form-input" [(ngModel)]="discoveryDate" />
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="entity-type">Entity Type</label>
-        <select id="entity-type" class="form-select" [(ngModel)]="entityType">
-          @for (opt of entityTypes; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
-          }
-        </select>
-      </div>
-    </div>
 
-    <button class="btn-analyze" [disabled]="selectedDataTypes().size === 0 || selectedStates().size === 0 || loading()" (click)="analyze()">
-      {{ loading() ? 'Generating...' : 'Generate notification matrix' }}
-    </button>
-  </section>
+      <div class="form-group">
+        <label class="form-label">Affected States</label>
+        <div class="pill-toggles">
+          @for (state of states; track state) {
+            <button
+              class="pill-toggle state-pill"
+              [class.active]="selectedStates().has(state)"
+              (click)="toggleState(state)">
+              {{ state }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="affected-count">Affected Individuals</label>
+          <input id="affected-count" type="number" class="form-input" [(ngModel)]="affectedCount" placeholder="Number or leave blank" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="encryption">Encryption Status</label>
+          <select id="encryption" class="form-select" [(ngModel)]="encryptionStatus">
+            @for (opt of encryptionOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="discovery-date">Date of Discovery</label>
+          <input id="discovery-date" type="date" class="form-input" [(ngModel)]="discoveryDate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="entity-type">Entity Type</label>
+          <select id="entity-type" class="form-select" [(ngModel)]="entityType">
+            @for (opt of entityTypes; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-analyze" [disabled]="selectedDataTypes().size === 0 || selectedStates().size === 0 || loading()" (click)="analyze()">
+        {{ loading() ? 'Generating...' : 'Generate notification matrix' }}
+      </button>
+    </section>
+  } @else {
+    <section class="input-collapsed">
+      <span class="collapsed-label">{{ collapsedLabel() }}</span>
+      <button class="collapsed-edit" (click)="inputExpanded.set(true)">Edit</button>
+    </section>
+  }
 
   @if (error()) {
     <div class="error-banner">{{ error() }}</div>

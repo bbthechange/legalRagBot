@@ -1,19 +1,26 @@
 <div class="knowledge-base">
   <!-- Search Input -->
-  <section class="search-section">
-    <h2>Knowledge Base</h2>
-    <div class="search-bar">
-      <input
-        type="text"
-        class="search-input"
-        [(ngModel)]="query"
-        placeholder="Ask a legal question..."
-        (keydown.enter)="search()" />
-      <button class="btn-search" [disabled]="!query.trim() || loading()" (click)="search()">
-        {{ loading() ? 'Searching...' : 'Search' }}
-      </button>
-    </div>
-  </section>
+  @if (inputExpanded()) {
+    <section class="search-section">
+      <h2>Knowledge Base</h2>
+      <div class="search-bar">
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="query"
+          placeholder="Ask a legal question..."
+          (keydown.enter)="search()" />
+        <button class="btn-search" [disabled]="!query.trim() || loading()" (click)="search()">
+          {{ loading() ? 'Searching...' : 'Search' }}
+        </button>
+      </div>
+    </section>
+  } @else {
+    <section class="input-collapsed">
+      <span class="collapsed-query">{{ query }}</span>
+      <button class="collapsed-edit" (click)="inputExpanded.set(true)">New search</button>
+    </section>
+  }
 
   @if (error()) {
     <div class="error-banner">{{ error() }}</div>

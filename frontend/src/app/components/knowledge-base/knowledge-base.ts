@@ -19,6 +19,7 @@ export class KnowledgeBaseComponent {
   loading = signal(false);
   error = signal<string | null>(null);
   response = signal<KBSearchResponse | null>(null);
+  inputExpanded = signal(true);
 
   answer = computed<KBAnswer | null>(() => {
     const r = this.response();
@@ -67,6 +68,7 @@ export class KnowledgeBaseComponent {
       next: (res) => {
         this.response.set(res);
         this.loading.set(false);
+        this.inputExpanded.set(false);
       },
       error: (err) => {
         this.error.set(err?.error?.detail || err?.message || 'Search failed. Check that the backend is running.');

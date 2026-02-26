@@ -1,29 +1,37 @@
 <div class="clause-analysis">
   <!-- Input Section -->
-  <section class="input-section">
-    <div class="input-header">
-      <h2>Clause Analysis</h2>
-      <div class="strategy-pills">
-        @for (s of strategies; track s.id) {
-          <button
-            class="strategy-pill"
-            [class.active]="strategy() === s.id"
-            [title]="s.hint"
-            (click)="strategy.set(s.id)">
-            {{ s.label }}
-          </button>
-        }
+  @if (inputExpanded()) {
+    <section class="input-section">
+      <div class="input-header">
+        <h2>Clause Analysis</h2>
+        <div class="strategy-pills">
+          @for (s of strategies; track s.id) {
+            <button
+              class="strategy-pill"
+              [class.active]="strategy() === s.id"
+              [title]="s.hint"
+              (click)="strategy.set(s.id)">
+              {{ s.label }}
+            </button>
+          }
+        </div>
       </div>
-    </div>
-    <textarea
-      class="clause-input"
-      [(ngModel)]="clauseText"
-      placeholder="Paste the clause text"
-      rows="5"></textarea>
-    <button class="btn-analyze" [disabled]="!clauseText.trim() || loading()" (click)="analyze()">
-      {{ loading() ? 'Analyzing...' : 'Analyze' }}
-    </button>
-  </section>
+      <textarea
+        class="clause-input"
+        [(ngModel)]="clauseText"
+        placeholder="Paste the clause text"
+        rows="5"></textarea>
+      <button class="btn-analyze" [disabled]="!clauseText.trim() || loading()" (click)="analyze()">
+        {{ loading() ? 'Analyzing...' : 'Analyze' }}
+      </button>
+    </section>
+  } @else {
+    <section class="input-collapsed">
+      <span class="collapsed-strategy">{{ strategyLabel() }}</span>
+      <span class="collapsed-preview">{{ clauseText.slice(0, 80) }}{{ clauseText.length > 80 ? '...' : '' }}</span>
+      <button class="collapsed-edit" (click)="inputExpanded.set(true)">Edit</button>
+    </section>
+  }
 
   @if (error()) {
     <div class="error-banner">{{ error() }}</div>

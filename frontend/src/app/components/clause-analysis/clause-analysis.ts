@@ -24,12 +24,17 @@ export class ClauseAnalysisComponent {
   response = signal<AnalyzeResponse | null>(null);
   editedRevision = signal<string>('');
   originalRevision = signal<string>('');
+  inputExpanded = signal(true);
 
   strategies = [
     { id: 'few_shot', label: 'Few-Shot', hint: 'Uses worked examples for highest accuracy' },
     { id: 'structured', label: 'Structured', hint: 'Detailed role and JSON schema guidelines' },
     { id: 'basic', label: 'Basic', hint: 'Minimal system prompt baseline' },
   ];
+
+  strategyLabel = computed(() =>
+    this.strategies.find(s => s.id === this.strategy())?.label ?? this.strategy()
+  );
 
   analysis = computed<ClauseAnalysis | null>(() => {
     const r = this.response();
@@ -77,6 +82,7 @@ export class ClauseAnalysisComponent {
         this.originalRevision.set(rev);
         this.editedRevision.set(rev);
         this.loading.set(false);
+        this.inputExpanded.set(false);
       },
       error: (err) => {
         this.error.set(err?.error?.detail || err?.message || 'Analysis failed. Check that the backend is running.');

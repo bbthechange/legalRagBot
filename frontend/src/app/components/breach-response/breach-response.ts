@@ -17,6 +17,7 @@ export class BreachResponseComponent {
   error = signal<string | null>(null);
   response = signal<BreachResponse | null>(null);
   viewMode = signal<'timeline' | 'matrix'>('timeline');
+  inputExpanded = signal(true);
 
   dataTypes = [
     { id: 'ssn', label: 'SSN' },
@@ -49,6 +50,12 @@ export class BreachResponseComponent {
   encryptionStatus = 'unknown';
   entityType = 'for_profit';
   discoveryDate = '';
+
+  collapsedLabel = computed(() => {
+    const types = Array.from(this.selectedDataTypes()).join(', ');
+    const states = Array.from(this.selectedStates()).join(', ');
+    return `${types} — ${states}`;
+  });
 
   summary = computed(() => this.response()?.summary);
 
@@ -97,6 +104,7 @@ export class BreachResponseComponent {
       next: (res) => {
         this.response.set(res);
         this.loading.set(false);
+        this.inputExpanded.set(false);
       },
       error: (err) => {
         this.error.set(err?.error?.detail || err?.message || 'Breach analysis failed. Check that the backend is running.');

@@ -1,7 +1,6 @@
 .breach-response {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .input-section {
@@ -94,8 +93,42 @@
 
 .output-section {
   padding: var(--space-lg) var(--space-xl);
+}
+
+.input-collapsed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-xl);
+  background: #fff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.collapsed-label {
   flex: 1;
-  overflow-y: auto;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy-700);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collapsed-edit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  background: none;
+  padding: 4px 12px;
+  border: 1px solid var(--gold-muted);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--gold-faint);
+  }
 }
 
 .rollup-cards {
