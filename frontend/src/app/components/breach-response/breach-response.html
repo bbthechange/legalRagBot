@@ -112,7 +112,7 @@
                 @if (entry.notify_ag) {
                   <p class="timeline-ag">AG notification required. {{ entry.ag_notification_details }}</p>
                 }
-                @if (entry.special_considerations?.length) {
+                @if (entry.special_considerations.length) {
                   <ul class="timeline-considerations">
                     @for (sc of entry.special_considerations; track sc) {
                       <li>{{ sc }}</li>
@@ -153,7 +153,7 @@
                   <td>{{ entry.notification_required ? 'Yes' : 'No' }}</td>
                   <td>{{ entry.notify_ag ? 'Yes' : 'No' }}</td>
                   <td>{{ entry.safe_harbor_applies ? 'Yes' : 'No' }}</td>
-                  <td class="td-considerations">{{ entry.special_considerations?.join('; ') || '\u2014' }}</td>
+                  <td class="td-considerations">{{ entry.special_considerations.join('; ') || '\u2014' }}</td>
                 </tr>
               }
             </tbody>

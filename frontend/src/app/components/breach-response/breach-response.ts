@@ -1,13 +1,12 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { BreachResponse } from '../../models/api.models';
 import { ActionBarComponent } from '../action-bar/action-bar';
 
 @Component({
   selector: 'app-breach-response',
-  imports: [FormsModule, DatePipe, ActionBarComponent],
+  imports: [FormsModule, ActionBarComponent],
   templateUrl: './breach-response.html',
   styleUrl: './breach-response.scss',
 })

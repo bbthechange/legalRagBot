@@ -65,7 +65,7 @@
           </div>
         </div>
 
-        @if (s.critical_issues?.length) {
+        @if (s.critical_issues.length) {
           <ul class="critical-issues">
             @for (issue of s.critical_issues; track issue) {
               <li>{{ issue }}</li>
@@ -82,7 +82,7 @@
             <div class="walkaway-item">
               <app-risk-badge level="walk_away" label="WALK-AWAY" />
               <span>{{ w.clause_type }}</span>
-              @if (w.gaps?.length) {
+              @if (w.gaps.length) {
                 <span class="walkaway-gap">&mdash; {{ w.gaps[0].issue }}</span>
               }
             </div>
@@ -125,7 +125,7 @@
                     <p class="preferred-text">{{ clause.preferred_position }}</p>
                   </div>
                 }
-                @if (clause.gaps?.length) {
+                @if (clause.gaps.length) {
                   <div class="detail-block">
                     <h4>Gaps Identified</h4>
                     @for (gap of clause.gaps; track gap.issue) {
