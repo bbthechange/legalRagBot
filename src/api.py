@@ -14,8 +14,11 @@ import logging
 import os
 import time
 
+from pathlib import Path
+
 from fastapi import FastAPI, Depends, HTTPException, Security, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.security import APIKeyHeader
 from dotenv import load_dotenv
 
@@ -263,6 +266,31 @@ def breach_analysis(req: BreachRequest, db: dict = Depends(get_db)):
         raise HTTPException(status_code=400, detail=report)
 
     return report
+
+
+# --- /api prefix support (production: frontend sends /api/health, etc.) ---
+
+@app.middleware("http")
+async def strip_api_prefix(request: Request, call_next):
+    """Strip /api prefix so frontend requests reach the right routes."""
+    path = request.scope["path"]
+    if path.startswith("/api/") or path == "/api":
+        request.scope["path"] = path[4:] or "/"
+    return await call_next(request)
+
+
+# --- Static file serving (production only — active when /app/static exists) ---
+
+_static_dir = Path(__file__).resolve().parent.parent / "static"
+
+if _static_dir.is_dir():
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve Angular SPA: static files or index.html fallback."""
+        file_path = (_static_dir / full_path).resolve()
+        if full_path and file_path.is_file() and str(file_path).startswith(str(_static_dir)):
+            return FileResponse(file_path)
+        return FileResponse(_static_dir / "index.html")
 
 
 # --- Entrypoint for python -m ---

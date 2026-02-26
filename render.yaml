@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: legalrag
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: PINECONE_INDEX_NAME
+        value: legal-clauses
+      - key: VECTOR_STORE_PROVIDER
+        value: pinecone
+      - key: LLM_PROVIDER
+        value: openai
