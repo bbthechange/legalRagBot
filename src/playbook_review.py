@@ -7,6 +7,7 @@ and generates a clause-by-clause report with gap analysis and redline suggestion
 
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from src.contract_chunker import extract_clauses
 from src.retrieval import search_similar_clauses, format_retrieval_results
@@ -126,14 +127,17 @@ def review_contract(
     clauses = extract_clauses(contract_text, db["provider"])
     logger.info(f"Extracted {len(clauses)} clauses from contract")
 
-    clause_analyses = []
-    for clause in clauses:
+    # Separate clauses with playbook matches (need API calls) from those without
+    clauses_to_review = []  # (index, clause, playbook_pos)
+    clause_analyses = [None] * len(clauses)
+
+    for i, clause in enumerate(clauses):
         playbook_pos = find_playbook_position(clause["clause_type"], playbook)
 
         if playbook_pos:
-            analysis = review_clause_against_playbook(clause, playbook_pos, db)
+            clauses_to_review.append((i, clause, playbook_pos))
         else:
-            analysis = {
+            clause_analyses[i] = {
                 "clause_type": clause["clause_type"],
                 "playbook_match": "not_covered",
                 "gaps": [],
@@ -144,7 +148,30 @@ def review_contract(
                 "position_in_contract": clause["position"],
             }
 
-        clause_analyses.append(analysis)
+    # Review matched clauses in parallel
+    if clauses_to_review:
+        logger.info(f"Reviewing {len(clauses_to_review)} clauses in parallel...")
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            futures = [
+                (i, executor.submit(review_clause_against_playbook, clause, playbook_pos, db))
+                for i, clause, playbook_pos in clauses_to_review
+            ]
+            for i, future in futures:
+                try:
+                    clause_analyses[i] = future.result()
+                except Exception:
+                    clause = next(c for idx, c, _ in clauses_to_review if idx == i)
+                    logger.error(f"Failed to review clause {i} ({clause['clause_type']}), marking as error")
+                    clause_analyses[i] = {
+                        "clause_type": clause["clause_type"],
+                        "playbook_match": "not_covered",
+                        "gaps": [],
+                        "suggested_redline": "",
+                        "risk_level": "unknown",
+                        "negotiation_notes": "Review failed due to an internal error. Manual review required.",
+                        "extracted_text": clause["text"][:500],
+                        "position_in_contract": clause["position"],
+                    }
 
     summary = _build_contract_summary(clause_analyses, playbook)
 

@@ -7,6 +7,7 @@ then uses an LLM to classify each chunk by clause type.
 
 import re
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
 from src.generation import generate_analysis
 from src.output_parser import parse_json_response_or_raw
@@ -38,9 +39,9 @@ _SECTION_PATTERN = re.compile(
         r"|(?:WHEREAS|NOW,?\s+THEREFORE)[,:]?\s+"                   # Recital markers
     r")"
     r"|"
-    # --- Group B: ALL CAPS headings — require strict line boundary ---
-    # Heading must be alone on its line: optional period, then newline or end
-    r"(?:^|\n)(?:[A-Z]{4,}|[A-Z]+\s+[A-Z]+)(?:\s+[A-Z]+)*\.?(?=\s*\n|\s*$)"
+    # --- Group B: ALL CAPS headings — require blank line or start of text ---
+    # Heading must be alone on its line without trailing period (rejects "ACME CORP.")
+    r"(?:^|\n\n)(?:[A-Z]{4,}|[A-Z]+\s+[A-Z]+)(?:\s+[A-Z]+)*(?=\s*\n|\s*$)"
     r")"
 )
 
@@ -87,6 +88,33 @@ def _extract_heading(match_text: str) -> str | None:
     return heading if heading else None
 
 
+def _hard_split(text: str, heading: str | None) -> list[dict]:
+    """Split text at nearest whitespace when no sentence boundaries exist."""
+    result = []
+    start = 0
+    while start < len(text):
+        end = start + MAX_CHUNK_LENGTH
+        if end >= len(text):
+            result.append(text[start:])
+            break
+        # Find nearest whitespace before the limit
+        split_at = text.rfind(" ", start, end)
+        if split_at <= start:
+            split_at = end  # no whitespace found, hard cut
+        result.append(text[start:split_at])
+        start = split_at + 1
+
+    chunks = []
+    for i, sub_text in enumerate(result):
+        sub_heading = heading
+        if i > 0 and sub_heading:
+            sub_heading = sub_heading + " (cont.)"
+        elif i > 0:
+            sub_heading = "(cont.)"
+        chunks.append({"text": sub_text.strip(), "position": 0, "heading": sub_heading})
+    return chunks
+
+
 def _split_large_chunk(chunk: dict) -> list[dict]:
     """Split an oversized chunk at sentence boundaries with overlap."""
     text = chunk["text"]
@@ -94,8 +122,10 @@ def _split_large_chunk(chunk: dict) -> list[dict]:
         return [chunk]
 
     sentences = _SENTENCE_BOUNDARY.split(text)
+
+    # Fallback: if no sentence boundaries, hard-split at nearest whitespace
     if len(sentences) <= 1:
-        return [chunk]
+        return _hard_split(text, chunk["heading"])
 
     sub_chunks = []
     current = ""
@@ -104,9 +134,11 @@ def _split_large_chunk(chunk: dict) -> list[dict]:
     for sentence in sentences:
         if current and len(current) + len(sentence) + 1 > MAX_CHUNK_LENGTH:
             sub_chunks.append(current)
-            # Start next sub-chunk with overlap from end of current
+            # Start next sub-chunk with overlap; truncate if overlap + sentence exceeds max
             overlap = current[-CHUNK_OVERLAP:] if len(current) > CHUNK_OVERLAP else current
-            current = overlap + " " + sentence
+            if len(overlap) + 1 + len(sentence) > MAX_CHUNK_LENGTH:
+                overlap = ""
+            current = (overlap + " " + sentence).lstrip() if overlap else sentence
         else:
             current = (current + " " + sentence).lstrip() if current else sentence
 
@@ -217,9 +249,15 @@ def extract_clauses(contract_text: str, provider) -> list[dict]:
     chunks = chunk_contract(contract_text)
     logger.info(f"Chunked contract into {len(chunks)} sections")
 
+    logger.info(f"Classifying {len(chunks)} clauses in parallel...")
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        classifications = list(executor.map(
+            lambda chunk: classify_clause_type(chunk["text"], provider),
+            chunks,
+        ))
+
     classified = []
-    for chunk in chunks:
-        classification = classify_clause_type(chunk["text"], provider)
+    for chunk, classification in zip(chunks, classifications):
         classified.append({
             "text": chunk["text"],
             "clause_type": classification["clause_type"],

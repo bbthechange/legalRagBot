@@ -110,7 +110,7 @@ class TestChunkContract:
             "3. TERMINATION  Either party may terminate with 30 days written notice."
         )
         chunks = chunk_contract(text)
-        assert len(chunks) >= 3
+        assert len(chunks) == 3
         assert "liability" in chunks[0]["text"].lower()
 
     def test_windows_crlf_line_endings(self):
@@ -164,8 +164,8 @@ class TestChunkContract:
         # Should get 2 chunks (the numbered sections), not extra from LLC/USA
         assert len(chunks) == 2
 
-    def test_all_caps_company_name_not_matched(self):
-        """ALL CAPS company names at line start are not false-matched as headings."""
+    def test_all_caps_company_name_inline_not_matched(self):
+        """ALL CAPS company names inline are not false-matched as headings."""
         text = (
             "1. PARTIES\n"
             "ACME CORP. is the service provider.\n"
@@ -175,6 +175,20 @@ class TestChunkContract:
         )
         chunks = chunk_contract(text)
         # Should be 2 numbered sections, not extra splits on company names
+        assert len(chunks) == 2
+
+    def test_all_caps_company_name_own_line_not_matched(self):
+        """ALL CAPS company names alone on their own line are not false-matched."""
+        text = (
+            "1. PARTIES\n"
+            "The following entities are parties to this agreement:\n\n"
+            "ACME CORP.\n"
+            "New York, NY\n\n"
+            "2. TERMINATION\n"
+            "Either party may terminate with 30 days notice."
+        )
+        chunks = chunk_contract(text)
+        # Should be 2 numbered sections, not extra from "ACME CORP."
         assert len(chunks) == 2
 
     def test_all_caps_real_headings_detected(self):
@@ -232,7 +246,7 @@ class TestChunkContract:
         )
         chunks = chunk_contract(text)
         # Should find WHEREAS (x2), NOW THEREFORE, and 1. SERVICES
-        assert len(chunks) >= 3
+        assert len(chunks) == 4
 
     def test_positions_sequential(self):
         """Positions are 0-indexed and sequential after all processing."""
