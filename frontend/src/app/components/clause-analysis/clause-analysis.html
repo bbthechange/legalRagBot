@@ -42,17 +42,43 @@
     <div class="output-section">
       <div class="output-main">
         @if (analysis(); as a) {
-          <!-- Risk + Assumptions -->
-          <div class="risk-assumptions">
-            <app-risk-badge [level]="a.risk_level" />
-            <span class="assumptions-text">
-              &mdash;
-              @for (assumption of a.assumptions; track assumption; let last = $last) {
-                {{ assumption }}{{ last ? '' : ', ' }}
+          <!-- Risk Badge -->
+          <app-risk-badge [level]="a.risk_level" />
+
+          <!-- Assumptions -->
+          @if (a.assumptions.length) {
+            <div class="assumptions-section">
+              <span class="assumptions-label">Assumptions</span>
+              <div class="assumption-chips">
+                @for (assumption of a.assumptions; track $index; let i = $index) {
+                  <button
+                    class="assumption-chip"
+                    [class.rejected]="rejectedAssumptions().has(i)"
+                    [attr.aria-pressed]="rejectedAssumptions().has(i)"
+                    (click)="toggleAssumption(i)">
+                    <span class="chip-indicator" aria-hidden="true">{{ rejectedAssumptions().has(i) ? '✗' : '✓' }}</span>
+                    <span class="chip-text">{{ assumption }}</span>
+                  </button>
+                }
+              </div>
+              @if (hasRejectedAssumptions()) {
+                <div class="assumptions-reanalyze">
+                  <span class="reanalyze-prompt">
+                    {{ rejectedAssumptions().size === 1 ? '1 assumption' : rejectedAssumptions().size + ' assumptions' }}
+                    marked incorrect.
+                  </span>
+                  <button
+                    class="btn-reanalyze"
+                    [disabled]="loading()"
+                    (click)="reAnalyzeWithCorrections()">
+                    {{ loading() ? 'Re-analyzing...' : 'Re-analyze with corrections' }}
+                  </button>
+                </div>
+              } @else {
+                <p class="assumptions-hint">Click any assumption that is incorrect.</p>
               }
-            </span>
-          </div>
-          <p class="assumptions-hint">If any assumption is incorrect, re-analyze with corrections.</p>
+            </div>
+          }
 
           <!-- Key Issues -->
           @if (normalizedKeyIssues().length) {

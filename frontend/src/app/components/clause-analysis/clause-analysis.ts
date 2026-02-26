@@ -25,6 +25,9 @@ export class ClauseAnalysisComponent {
   editedRevision = signal<string>('');
   originalRevision = signal<string>('');
   inputExpanded = signal(true);
+  rejectedAssumptions = signal<Set<number>>(new Set());
+
+  hasRejectedAssumptions = computed(() => this.rejectedAssumptions().size > 0);
 
   strategies = [
     { id: 'few_shot', label: 'Few-Shot', hint: 'Uses worked examples for highest accuracy' },
@@ -64,19 +67,21 @@ export class ClauseAnalysisComponent {
 
   hasEdits = computed(() => this.editedRevision() !== this.originalRevision());
 
-  analyze(): void {
-    if (!this.clauseText.trim() || this.loading()) return;
+  analyze(clauseOverride?: string): void {
+    const text = clauseOverride || this.clauseText;
+    if (!text.trim() || this.loading()) return;
     this.loading.set(true);
     this.error.set(null);
     this.response.set(null);
 
     this.api.analyzeClause({
-      clause_text: this.clauseText,
+      clause_text: text,
       strategy: this.strategy(),
       top_k: 3,
     }).subscribe({
       next: (res) => {
         this.response.set(res);
+        this.rejectedAssumptions.set(new Set());
         const a = typeof res.analysis === 'string' ? null : res.analysis;
         const rev = a?.suggested_revisions || '';
         this.originalRevision.set(rev);
@@ -89,6 +94,33 @@ export class ClauseAnalysisComponent {
         this.loading.set(false);
       },
     });
+  }
+
+  toggleAssumption(index: number): void {
+    const current = new Set(this.rejectedAssumptions());
+    if (current.has(index)) {
+      current.delete(index);
+    } else {
+      current.add(index);
+    }
+    this.rejectedAssumptions.set(current);
+  }
+
+  reAnalyzeWithCorrections(): void {
+    const a = this.analysis();
+    if (!a || !this.hasRejectedAssumptions()) return;
+
+    const rejected = a.assumptions
+      .filter((_, i) => this.rejectedAssumptions().has(i))
+      .map(text => `- "${text}" is NOT correct`)
+      .join('\n');
+
+    const augmentedText = this.clauseText +
+      '\n\n[ASSUMPTION CORRECTIONS — the following assumptions from a prior analysis are incorrect:\n' +
+      rejected +
+      '\nPlease re-analyze with these corrections in mind.]';
+
+    this.analyze(augmentedText);
   }
 
   onCitationClick(index: number): void {

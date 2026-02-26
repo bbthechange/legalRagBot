@@ -143,24 +143,111 @@
   gap: var(--space-lg);
 }
 
-.risk-assumptions {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
+.assumptions-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
 }
 
-.assumptions-text {
-  font-size: 14px;
+.assumption-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.assumption-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--charcoal);
-  font-style: italic;
-  line-height: 1.5;
+  background: var(--ivory);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  line-height: 1.4;
+
+  &:hover {
+    border-color: var(--slate-400);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold-muted);
+    outline-offset: 2px;
+  }
+
+  &.rejected {
+    background: var(--risk-high-bg);
+    border-color: var(--risk-high);
+    color: var(--risk-high);
+
+    .chip-text {
+      text-decoration: line-through;
+      text-decoration-color: rgba(185, 28, 28, 0.4);
+    }
+  }
+}
+
+.chip-indicator {
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--slate-400);
+
+  .assumption-chip.rejected & {
+    color: var(--risk-high);
+  }
+}
+
+.assumptions-reanalyze {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--risk-high-bg);
+  border-left: 3px solid var(--risk-high);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.reanalyze-prompt {
+  font-size: 13px;
+  color: var(--risk-high);
+  font-weight: 500;
+}
+
+.btn-reanalyze {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--risk-high);
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+  transition: background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #991b1b;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .assumptions-hint {
   font-size: 12px;
   color: var(--slate-500);
-  margin-top: -8px;
+  margin-top: var(--space-xs);
 }
 
 .key-issues {
